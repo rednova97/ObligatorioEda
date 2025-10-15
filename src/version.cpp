@@ -10,11 +10,18 @@
 
 
 
-struct _rep_version {
+struct nodoAV {
     char* nombreVersion;
+    int tope;
     Linea linea;
+    nodoAV * pH;        //primer hijo
+    nodoAV * sH;        //siguiente hermano    
+};
+
+
+struct _rep_version {
+    AV ver;
     _rep_version *sig;
-    _rep_version *ant;
 };
 
 //***********************  CONSTRUCTORAS ***************** */
@@ -24,10 +31,71 @@ Version crearVersionVacia(){
     return NULL;  // Lista vacía de versiones
 }
 
+void convertirArregloCharEnArregloInt(char *string, int *&numero, int &tope){
+    //contamos la cantidad de puntos
+    int largo = strlen(string);
+    int puntos=0;
+    for(int i=0; i<largo; i++){
+        if(string[i]=='.')
+            puntos++;
+    }
+
+    //calculo del tope
+    tope = puntos;
+
+    //arreglo dinamico para almacenar los numeros
+    numero = new int[tope+1];
+
+    int nivel=0;        //indice dentro del arreglo, representa el nivel dentro del arbol
+    int valor=0;
+
+    for(int i=0; i <= largo; i++){
+        if (string[i] == '.' || string[i]=='\0'){
+            numero[nivel] = valor;
+            nivel++;
+            valor = 0;
+        }
+        else {
+            valor = valor*10 + (string[i] - '0');
+        }
+    }
+}
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version
 //			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
 void crearVersion (Version &version, char *num_version){
+    Version nueva = new _rep_version;
+    AV raiz = new nodoAV;
+    raiz->linea = crearLineaVacia();
+    raiz->pH = NULL;
+    raiz->sH = NULL;
+    raiz->nombreVersion = new char[strlen(num_version) + 1];
+    strcpy(raiz->nombreVersion, num_version);
+
+    //calcular el tope del arreglo de caracteres
+    int tope = 0;
+    for(int i=0; num_version[i] != '\0'; i++){
+        if (num_version[i]=='.')
+            tope++;
+    }
+
+    raiz->tope = tope;
+
+    nueva->ver = raiz;
+
+    
+
+
+    
+}
+
+
+
+//Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
+//Pos-Cond: Crea una nueva version con el numero de verion "num_version
+//			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
+/*void crearVersion (Version &version, char *num_version){
     int pos = atoi(num_version);
     
     Version nueva = new _rep_version;
@@ -89,6 +157,7 @@ void crearVersion (Version &version, char *num_version){
         numero++;
     }
 }
+    */
 
 
 //************************ SELECTORAS ********************* */

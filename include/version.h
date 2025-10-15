@@ -12,6 +12,8 @@
 #define _VERSION_H
 
 
+typedef struct nodoAV * AV;
+
 typedef struct _rep_version *Version;
 
 
@@ -65,6 +67,8 @@ int numeroUltimaVersion(Version version);
 //Pre-Cond: No tiene
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
 int numeroUltimaLineaVersion(Version version);
+
+void convertirArregloCharEnArregloInt(char *string, int *&numero, int &tope);
 
 //********************* PREDICADOS ************************* */
 
