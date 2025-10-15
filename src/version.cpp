@@ -11,7 +11,7 @@
 
 
 struct nodoAV {
-    char* nombreVersion;
+    int* numeroVersion;
     int tope;
     Linea linea;
     nodoAV * pH;        //primer hijo
@@ -20,7 +20,7 @@ struct nodoAV {
 
 
 struct _rep_version {
-    AV ver;
+    AV versionRaiz;
     _rep_version *sig;
 };
 
@@ -32,7 +32,7 @@ Version crearVersionVacia(){
 }
 
 //pre-cond: no tiene
-//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros, eliminando los puntos 
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos 
 void parsear(char *string, int *&numero, int &tope){
     //contamos la cantidad de puntos
     int largo = strlen(string);
@@ -72,19 +72,22 @@ void crearVersion (Version &version, char *num_version){
     raiz->linea = crearLineaVacia();
     raiz->pH = NULL;
     raiz->sH = NULL;
+    raiz->numeroVersion = NULL;
+
+    int *arrInt;
+    int lim;        //sera el tope del arreglo
+    parsear(num_version, arrInt, lim);          //paso el string num_version y lo devuelvo como arreglo de enteros en arrInt con tope "lim"
+    raiz->numeroVersion = arrInt;
+    raiz->tope = lim;
+
+    
+
+
     raiz->nombreVersion = new char[strlen(num_version) + 1];
     strcpy(raiz->nombreVersion, num_version);
 
-    //calcular el tope del arreglo de caracteres
-    int tope = 0;
-    for(int i=0; num_version[i] != '\0'; i++){
-        if (num_version[i]=='.')
-            tope++;
-    }
 
-    raiz->tope = tope;
-
-    nueva->ver = raiz;
+    nueva->versionRaiz = raiz;
 
     
 
