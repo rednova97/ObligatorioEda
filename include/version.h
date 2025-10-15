@@ -22,6 +22,10 @@ typedef struct _rep_version *Version;
 //Pos-Cond: Retorna una version vacia
 Version crearVersionVacia();
 
+//pre-cond: no tiene
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros, eliminando los puntos 
+void parsear(char *string, int *&numero, int &tope);
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de
 //			la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version

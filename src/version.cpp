@@ -31,7 +31,9 @@ Version crearVersionVacia(){
     return NULL;  // Lista vacía de versiones
 }
 
-void convertirArregloCharEnArregloInt(char *string, int *&numero, int &tope){
+//pre-cond: no tiene
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros, eliminando los puntos 
+void parsear(char *string, int *&numero, int &tope){
     //contamos la cantidad de puntos
     int largo = strlen(string);
     int puntos=0;
