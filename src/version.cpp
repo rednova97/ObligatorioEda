@@ -179,6 +179,24 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
     insertarLinea(aux->linea, textoFila, numLinea);     //insertamos la linea en la version y reenumeramos las siguientes por debajo (si hay)
 }
 
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
+AV buscar(AV t, char *nombreVersion){
+    if (t==NULL)
+        return NULL;
+    else {
+        if (strcmp(t->nombreVersion, nombreVersion)!=0){
+            AV esta_sH = buscar(t->sH, nombreVersion);
+            if (esta_sH != NULL)
+                return esta_sH;
+            else
+                return buscar(t->pH, nombreVersion);
+        }
+        else
+            return t;
+    }
+}
+
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
 void imprimirVersion(Version version, char* numeroVersion){
