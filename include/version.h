@@ -30,6 +30,10 @@ void parsear(char *string, int *&numero, int &tope);
 //pos-cond: copia el arreglo de enteros origen en el arreglo de enteros destino
 void copiarArrInt(int *origen, int *destino, int tope);
 
+//pre-cond: la version con numVer existe
+//pos-cond: reenumera los hijos de la version numVer como numVer + 1
+void renumHijosAsc(AV t, int *numVer, int tope);
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de
 //			la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version

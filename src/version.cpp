@@ -71,6 +71,21 @@ void copiarArrInt(int *origen, int *destino, int tope){
         destino[i] = origen[i];
 }
 
+//pre-cond: la version con numVer existe
+//pos-cond: reenumera los hijos de la version numVer como numVer + 1
+void renumHijosAsc(AV t, int *numVer, int tope){
+    if(t != NULL){
+        copiarArrInt(numVer, t->numeroVersion, tope);   //copiamos el numero de version numVer en t->numVer
+        t->tope = tope;
+
+        if (t->pH != NULL)
+            renumHijosAsc(t->pH, t->numeroVersion, t->tope + 1);
+
+        if (t->sH != NULL)
+            renumHijosAsc(t->sH, numVer, tope);
+    }
+}
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version
 //			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
