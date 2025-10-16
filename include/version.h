@@ -28,7 +28,7 @@ void parsear(char *string, int *&numero, int &tope);
 
 //pre-cond: no tiene
 //pos-cond: copia el arreglo de enteros origen en el arreglo de enteros destino
-void copiarArrInt(int *origen, int *destino, int i, int tope);
+void copiarArrInt(int *origen, int *destino, int tope);
 
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de
 //			la Version "version" 
