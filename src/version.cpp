@@ -63,31 +63,44 @@ void parsear(char *string, int *&numero, int &tope){
     }
 }
 
+
+//pre-cond: no tiene
+//pos-cond: copia el arreglo de enteros origen en el arreglo de enteros destino
+void copiarArrInt(int *origen, int *destino, int i, int tope){
+    if (i<=tope){
+        destino[i] = origen[i];
+        copiarArrInt(origen, destino, i+1, tope);
+    }
+}
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version
 //			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
 void crearVersion (Version &version, char *num_version){
-    Version nueva = new _rep_version;
-    AV raiz = new nodoAV;
-    raiz->linea = crearLineaVacia();
-    raiz->pH = NULL;
-    raiz->sH = NULL;
-    raiz->numeroVersion = NULL;
+    AV nodoNuevo = new nodoAV;
+    nodoNuevo->linea = crearLineaVacia();
+    nodoNuevo->tope = -1;
 
     int *arrInt;
     int lim;        //sera el tope del arreglo
     parsear(num_version, arrInt, lim);          //paso el string num_version y lo devuelvo como arreglo de enteros en arrInt con tope "lim"
-    raiz->numeroVersion = arrInt;
-    raiz->tope = lim;
 
-    
+    unsigned int nivel = lim + 1;       //marca la cantidad de niveles del arbol de versiones
+
+    if (nivel == 1){    //si nivel = 1, quiere decir que vamos a insertar una version padre que sera la raiz del arbol finitario de versiones
+        Version nueva = new _rep_version;
+        nueva->sig = NULL;
+        nueva->versionRaiz = nodoNuevo;
+        nodoNuevo->pH = NULL;
+        nodoNuevo->sH = NULL;
+        nodoNuevo->numeroVersion = arrInt;
+        nodoNuevo->tope = lim;
+    }
+    else {
+
+    }
 
 
-    raiz->nombreVersion = new char[strlen(num_version) + 1];
-    strcpy(raiz->nombreVersion, num_version);
-
-
-    nueva->versionRaiz = raiz;
 
     
 
@@ -96,6 +109,12 @@ void crearVersion (Version &version, char *num_version){
 }
 
 
+/*    raiz->nombreVersion = new char[strlen(num_version) + 1];
+    strcpy(raiz->nombreVersion, num_version);
+
+
+    nueva->versionRaiz = raiz;
+*/
 
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version
