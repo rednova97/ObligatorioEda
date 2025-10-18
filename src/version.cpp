@@ -64,25 +64,18 @@ void parsear(char *string, int *&numero, int &tope){
 }
 
 
-//pre-cond: no tiene
-//pos-cond: copia el arreglo de enteros origen en el arreglo de enteros destino
-void copiarArrInt(int *origen, int *destino, int tope){
-    for(int i=0; i<=tope; i++)
-        destino[i] = origen[i];
-}
-
 //pre-cond: la version con numVer existe
 //pos-cond: reenumera los hijos de la version numVer como numVer + 1
-void renumHijosAsc(AV t, int *numVer, int tope){
+void renumeracionAscendente(AV t, int pos){
     if(t != NULL){
-        copiarArrInt(numVer, t->numeroVersion, tope);   //copiamos el numero de version numVer en t->numVer
-        t->tope = tope;
-
-        if (t->pH != NULL)
-            renumHijosAsc(t->pH, t->numeroVersion, t->tope + 1);
-
-        if (t->sH != NULL)
-            renumHijosAsc(t->sH, numVer, tope);
+        if (t->pH != NULL){
+            renumeracionAscendente(t, pos);
+            t->numeroVersion[pos]++;
+        }
+        if (t->sH != NULL){
+            renumeracionAscendente(t, pos);
+            t->numeroVersion[pos]++;
+        }
     }
 }
 
