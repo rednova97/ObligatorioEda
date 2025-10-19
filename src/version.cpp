@@ -31,6 +31,7 @@ Version crearVersionVacia(){
     return NULL;  // Lista vacía de versiones
 }
 
+
 //pre-cond: no tiene
 //pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos 
 void parsear(char *string, int *&numero, int &tope){
@@ -63,6 +64,42 @@ void parsear(char *string, int *&numero, int &tope){
     }
 }
 
+void copiarArreglo(int *origen, int *destino, int n){
+    for (int i=0; i<n; i++)
+        destino[i] = origen[i];
+}
+
+
+AV crearNodo(int *numeroVersion, int tope){
+    AV nuevo = new nodoAV;
+    nuevo->numeroVersion = new int;
+    copiarArreglo(numeroVersion, nuevo->numeroVersion, tope);
+    nuevo->tope = tope;
+    nuevo->linea = crearLineaVacia();
+    nuevo->pH = NULL;
+    nuevo->sH = NULL;
+    return nuevo;
+}
+
+
+
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
+AV buscar(AV t, int *numeroVersion){
+    if (t == NULL)
+        return NULL;
+    else {
+        if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope)){
+            AV esta_SH = buscar(t->sH, numeroVersion);
+            if (esta_SH != NULL)
+                return esta_SH;
+            else
+                return buscar(t->pH, numeroVersion);
+        }
+        else 
+            return t;
+    }
+}
 
 //pre-cond: la version con numVer existe
 //pos-cond: reenumera los hijos de la version numVer como numVer + 1
@@ -92,48 +129,33 @@ void renumeracionDescendente(AV t, int pos){
     }  
 }
 
+
+
+
+
+
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
-//Pos-Cond: Crea una nueva version con el numero de verion "num_version
-//			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
+//Pos-Cond: Crea una nueva version con el numero de verion "num_version. Las versiones iguales y mayores a num_version se les suma 1 al numero de version, lo mismo con
 void crearVersion (Version &version, char *num_version){
-    AV nodoNuevo = new nodoAV;
-    nodoNuevo->linea = crearLineaVacia();
-    nodoNuevo->tope = -1;
+    int *numVer = new int;
+    parsear(num_version, numVer, version->versionRaiz->tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
 
-    int *arrInt;
-    int lim;        //sera el tope del arreglo
-    parsear(num_version, arrInt, lim);          //paso el string num_version y lo devuelvo como arreglo de enteros en arrInt con tope "lim"
+    int aBuscar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
+    Version aux = version;
 
-    unsigned int nivel = lim + 1;       //marca la cantidad de niveles del arbol de versiones
-
-    if (nivel == 1){    //si nivel = 1, quiere decir que vamos a insertar una version padre que sera la raiz del arbol finitario de versiones
-        Version nueva = new _rep_version;
-        nueva->sig = NULL;
-        nueva->versionRaiz = nodoNuevo;
-        nodoNuevo->pH = NULL;
-        nodoNuevo->sH = NULL;
-        nodoNuevo->numeroVersion = arrInt;
-        nodoNuevo->tope = lim;
-    }
-    else {
-
-    }
-
-
-
+    while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aBuscar))
+        aux = aux->sig;
     
+
+
+
 
 
     
 }
 
 
-/*    raiz->nombreVersion = new char[strlen(num_version) + 1];
-    strcpy(raiz->nombreVersion, num_version);
 
-
-    nueva->versionRaiz = raiz;
-*/
 
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version
@@ -222,23 +244,7 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
     insertarLinea(aux->linea, textoFila, numLinea);     //insertamos la linea en la version y reenumeramos las siguientes por debajo (si hay)
 }
 
-//Pre-cond: no tiene
-//Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
-AV buscar(AV t, char *nombreVersion){
-    if (t==NULL)
-        return NULL;
-    else {
-        if (strcmp(t->nombreVersion, nombreVersion)!=0){
-            AV esta_sH = buscar(t->sH, nombreVersion);
-            if (esta_sH != NULL)
-                return esta_sH;
-            else
-                return buscar(t->pH, nombreVersion);
-        }
-        else
-            return t;
-    }
-}
+
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
@@ -306,6 +312,14 @@ bool existeVersion (Version version, char* numeroVersion){
         aux = aux->sig;
     }
     return false;
+}
+
+bool sonIgualesArrInt(int *a, int *b, int n){
+    for (int i=0; i<n; i++){
+        if (a[i] != b[i])
+            return false;
+    }
+    return true;
 }
 
 //****************  DESTRUCTORAS ***********************
