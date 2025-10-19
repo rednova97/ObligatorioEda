@@ -68,15 +68,28 @@ void parsear(char *string, int *&numero, int &tope){
 //pos-cond: reenumera los hijos de la version numVer como numVer + 1
 void renumeracionAscendente(AV t, int pos){
     if(t != NULL){
+        t->numeroVersion[pos]++;
+
         if (t->pH != NULL){
-            renumeracionAscendente(t, pos);
-            t->numeroVersion[pos]++;
+            renumeracionAscendente(t->pH, pos);
         }
         if (t->sH != NULL){
-            renumeracionAscendente(t, pos);
-            t->numeroVersion[pos]++;
+            renumeracionAscendente(t->sH, pos);
         }
     }
+}
+
+void renumeracionDescendente(AV t, int pos){
+    if(t != NULL){
+        t->numeroVersion[pos]--;
+
+        if (t->pH != NULL){
+            renumeracionDescendente(t->pH, pos);
+        }
+        if (t->sH != NULL){
+            renumeracionDescendente(t->sH, pos);
+        }
+    }  
 }
 
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
