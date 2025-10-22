@@ -34,7 +34,7 @@ Version crearVersionVacia(){
 
 //pre-cond: no tiene
 //pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos 
-void parsear(char *string, int *&numero, int &tope){
+void convertirStringEnArrInt(char *string, int *&numero, int &tope){
     //contamos la cantidad de puntos
     int largo = strlen(string);
     int puntos=0;
@@ -64,12 +64,16 @@ void parsear(char *string, int *&numero, int &tope){
     }
 }
 
+
+//Pre-cond: no tiene
+//pos-cond: copia el arreglo origen en el arreglo destino
 void copiarArreglo(int *origen, int *destino, int n){
     for (int i=0; i<n; i++)
         destino[i] = origen[i];
 }
 
-
+//pre-cond: no tiene
+//pos-cond: crea un nodo con numero de version "numeroVersion" y tope "tope"
 AV crearNodo(int *numeroVersion, int tope){
     AV nuevo = new nodoAV;
     nuevo->numeroVersion = new int;
@@ -81,10 +85,8 @@ AV crearNodo(int *numeroVersion, int tope){
     return nuevo;
 }
 
-
-
 //Pre-cond: no tiene
-//Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
+//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
 AV buscar(AV t, int *numeroVersion){
     if (t == NULL)
         return NULL;
@@ -101,8 +103,33 @@ AV buscar(AV t, int *numeroVersion){
     }
 }
 
-//pre-cond: la version con numVer existe
-//pos-cond: reenumera los hijos de la version numVer como numVer + 1
+//Pre-cond: no tiene
+//Pos-cond: inserta el nodo nuevo en el arbol actual
+AV insertarSubVersion(AV actual, AV nuevo){
+    if (actual == NULL)
+        return NULL;
+    
+    //si ambos tienen el mismo padre
+    if (sonIgualesArrInt(actual->numeroVersion, nuevo->numeroVersion, actual->tope, nuevo->tope)){
+        nuevo->sH = actual;
+        return nuevo;
+    }
+
+    //si el nodo actual esta en un nivel supererior, entonces nuevo va como hijo de actual
+    if (esAnterior(actual->numeroVersion, nuevo->numeroVersion, actual->tope, nuevo->tope)){
+        actual->pH = insertarSubVersion(actual->pH, nuevo);
+        return actual;
+    }
+    //sino, insertamos nuevo como hermano de actual
+    else {
+        actual->sH = insertarSubVersion(actual->sH, nuevo);
+        return actual;
+    }
+}
+
+
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t + 1 a partir de la posicion pos
 void renumeracionAscendente(AV t, int pos){
     if(t != NULL){
         t->numeroVersion[pos]++;
@@ -116,6 +143,8 @@ void renumeracionAscendente(AV t, int pos){
     }
 }
 
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t - 1 a partir de la posicion pos
 void renumeracionDescendente(AV t, int pos){
     if(t != NULL){
         t->numeroVersion[pos]--;
@@ -138,7 +167,7 @@ void renumeracionDescendente(AV t, int pos){
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version. Las versiones iguales y mayores a num_version se les suma 1 al numero de version, lo mismo con
 void crearVersion (Version &version, char *num_version){
     int *numVer = new int;
-    parsear(num_version, numVer, version->versionRaiz->tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
+    convertirStringEnArrInt(num_version, numVer, version->versionRaiz->tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
 
     int aBuscar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
     Version aux = version;
@@ -146,83 +175,64 @@ void crearVersion (Version &version, char *num_version){
     while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aBuscar))
         aux = aux->sig;
     
+    //si el tamaño es 1 quiere decir que queremos ingresar una nueva version raiz
+    if (sizeof(numVer) == 1){           
+        //si entramos aca quiere decir que la version que queremos ingresar ya existe
+        if (aux->versionRaiz->numeroVersion[0] == aBuscar){  
+            //insertamos al comienzo de la lista de versiones
+            if (aBuscar == 1){                
+                Version nueva = new _rep_version;
+                nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
+                nueva->sig = version;
+                version = nueva;
 
+                while (aux != NULL){
+                    renumeracionAscendente(aux->versionRaiz, 0);
+                    aux = aux->sig;
+                }
+            }
+            //insertamos en el "medio"
+            else {              
+                Version temp = version;
+                int cont = 1;
+                while (temp != NULL && cont < aBuscar - 1){
+                    temp = temp->sig;
+                    cont++;
+                }
+                Version nueva = new _rep_version;
+                nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
+                nueva->sig = temp->sig;
+                temp->sig = nueva;
 
+                while (aux != NULL) {
+                    renumeracionAscendente(aux->versionRaiz, 0);
+                    aux = aux->sig;
+                }
+            }
 
-
-
-    
-}
-
-
-
-
-//Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
-//Pos-Cond: Crea una nueva version con el numero de verion "num_version
-//			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
-/*void crearVersion (Version &version, char *num_version){
-    int pos = atoi(num_version);
-    
-    Version nueva = new _rep_version;
-    int len = strlen(num_version) + 1;
-    nueva->nombreVersion = new char[len];
-    strcpy(nueva->nombreVersion, num_version);
-    nueva->linea = crearLineaVacia();
-    
-    // Insertar en la posición correcta
-    Version aux = version;
-    int contador = 1;
-
-    if (version == NULL) {
-        nueva->ant = NULL;
-        nueva->sig = NULL;
-        version = nueva;
-        aux = nueva;  
-    } else {
-        while (aux != NULL && contador < pos) {
-            aux = aux->sig;
-            contador++;
         }
-
-        if (aux == NULL) {
-            // Insertar al final
-            Version ultima = version;
-            while (ultima->sig != NULL)
-                ultima = ultima->sig;
-
-            nueva->ant = ultima;
+        //si entramos aca es porque esa version no existe y por lo tanto, vamos a insertar al final
+        else {                      
+            Version temp = version;
+            while (temp->sig != NULL)
+                temp = temp->sig;
+            Version nueva = new _rep_version;
+            nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
             nueva->sig = NULL;
-            ultima->sig = nueva;
-
-            aux = nueva;  // empezamos renumeración desde la nueva versión
-        } else {
-            // Insertar antes de aux, puede ser en el medio o al principio
-            nueva->sig = aux;
-            nueva->ant = aux->ant;
-
-            if (aux->ant != NULL)
-                aux->ant->sig = nueva;
-            else
-                version = nueva;  // insertando al principio
-
-            aux->ant = nueva;
-
-            aux = nueva;  // empezamos renumeración desde la nueva versión
+            temp->sig = NULL;
         }
     }
-    
-    // Reenumerar desde la nueva versión hasta el final
-    int numero = pos;
-    while (aux != NULL) {
-        delete [] aux->nombreVersion;
-        aux->nombreVersion = new char[MAX_VERSIONES];
-        aux->nombreVersion[0] = numero + '0';  
-        aux->nombreVersion[1] = '\0';
-        aux = aux->sig;
-        numero++;
+    //sino, vamos a insertar una subversion
+    else {
+        AV nuevaSubVer = crearNodo(numVer, sizeof(numVer));
+        aux->versionRaiz = insertarSubVersion(aux->versionRaiz, nuevaSubVer);
+        if (nuevaSubVer->sH != NULL)
+            renumeracionAscendente(nuevaSubVer->sH, nuevaSubVer->tope);
     }
-}
-    */
+
+}    
+
+
 
 
 //************************ SELECTORAS ********************* */
@@ -314,12 +324,29 @@ bool existeVersion (Version version, char* numeroVersion){
     return false;
 }
 
-bool sonIgualesArrInt(int *a, int *b, int n){
-    for (int i=0; i<n; i++){
+//pre-cond: a y b tienen el mismo tamanio
+//pos-cond: devuelve true si a y b son iguales
+bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB){
+    if (sizeA != sizeB)
+        return false;
+
+    for (int i=0; i<topeA; i++){
         if (a[i] != b[i])
             return false;
     }
     return true;
+}
+
+bool esAnterior(int *a, int *b, int sizeA, int sizeB){
+    if (sizeA > sizeB)
+        return false;    //a es mas largo que b y por lo tanto esta en un nivel inferior
+    
+    for(int i = 0; i < sizeA; i++){
+        if(a[i] != b[i])
+            return false;       //a esta en algun nivel superior
+    }
+    return true;
+    
 }
 
 //****************  DESTRUCTORAS ***********************

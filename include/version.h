@@ -24,15 +24,32 @@ Version crearVersionVacia();
 
 //pre-cond: no tiene
 //pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros, eliminando los puntos 
-void parsear(char *string, int *&numero, int &tope);
+void convertirStringEnArrInt(char *string, int *&numero, int &tope);
+
+//Pre-cond: no tiene
+//pos-cond: copia el arreglo origen en el arreglo destino
+void copiarArreglo(int *origen, int *destino, int n);
 
 //pre-cond: no tiene
-//pos-cond: copia el arreglo de enteros origen en el arreglo de enteros destino
-void copiarArrInt(int *origen, int *destino, int tope);
+//pos-cond: crea un nodo con numero de version "numeroVersion" y tope "tope"
+AV crearNodo(int *numeroVersion, int tope);
 
-//pre-cond: la version con numVer existe
-//pos-cond: reenumera los hijos de la version numVer como numVer + 1
-void renumHijosAsc(AV t, int *numVer, int tope);
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
+AV buscar(AV t, int *numeroVersion);
+
+//Pre-cond: no tiene
+//Pos-cond: inserta el nodo nuevo en el arbol actual
+AV insertarSubVersion(AV actual, AV nuevo);
+
+
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t + 1 a partir de la posicion pos
+void renumeracionAscendente(AV t, int pos);
+
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t - 1 a partir de la posicion pos
+void renumeracionDescendente(AV t, int pos);
 
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de
 //			la Version "version" 
@@ -95,6 +112,18 @@ bool esVaciaVersion (Version version);
 
 //Retorna true si la Version "numeroVersion" existe en "version"
 bool existeVersion (Version version, char* numeroVersion);
+
+//pre-cond: no tiene
+//pos-cond: devuelve TRUE si a y b son iguales
+bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB);
+
+//pre-cond: no tiene
+//pos-cond: devuelve TRUE si a esta en un nivel superior a b
+bool esAnterior(int *a, int *b, int sizeA, int sizeB);
+
+
+
+
 
 //****************  DESTRUCTORAS ***********************
 
