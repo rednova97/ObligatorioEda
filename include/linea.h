@@ -46,6 +46,9 @@ unsigned int getNumeroLinea(Linea linea);
 //          sin compartir memoria con "linea"
 char* obtenerTextoLinea (Linea linea, unsigned int numLinea);
 
+//pos-cond: devuelve una copia de la linea "linea" sin compartir memoria
+Linea copiarLinea(Linea linea);
+
 //*************************** PREDICADOS ********************** */
 
 //Pos-Cond: retorna true si linea es vacía

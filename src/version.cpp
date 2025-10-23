@@ -226,6 +226,7 @@ void crearVersion (Version &version, char *num_version){
     else {
         AV nuevaSubVer = crearNodo(numVer, sizeof(numVer));
         aux->versionRaiz = insertarSubVersion(aux->versionRaiz, nuevaSubVer);
+        nuevaSubVer->linea = copiarLinea(aux->versionRaiz->linea);
         if (nuevaSubVer->sH != NULL)
             renumeracionAscendente(nuevaSubVer->sH, nuevaSubVer->tope);
     }
