@@ -85,23 +85,6 @@ AV crearNodo(int *numeroVersion, int tope){
     return nuevo;
 }
 
-//Pre-cond: no tiene
-//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
-AV buscar(AV t, int *numeroVersion){
-    if (t == NULL)
-        return NULL;
-    else {
-        if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope)){
-            AV esta_SH = buscar(t->sH, numeroVersion);
-            if (esta_SH != NULL)
-                return esta_SH;
-            else
-                return buscar(t->pH, numeroVersion);
-        }
-        else 
-            return t;
-    }
-}
 
 //Pre-cond: no tiene
 //Pos-cond: inserta el nodo nuevo en el arbol actual
@@ -238,14 +221,50 @@ void crearVersion (Version &version, char *num_version){
 
 //************************ SELECTORAS ********************* */
 
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
+AV buscar(AV t, int *numeroVersion){
+    if (t == NULL)
+        return NULL;
+    else {
+        if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope)){
+            AV esta_SH = buscar(t->sH, numeroVersion);
+            if (esta_SH != NULL)
+                return esta_SH;
+            else
+                return buscar(t->pH, numeroVersion);
+        }
+        else 
+            return t;
+    }
+}
+
+
 //Pre-Cond: la version numVersion existe en version
 //Pos-Cond: Retorna un puntero a la version de nombre "numVersion"
-Version obtenerVersion(Version &version, char *numVersion){
-    Version aux = version;
-    while (strcmp(aux->nombreVersion, numVersion) != 0)
-        aux = aux->sig;
-    return aux;
+AV obtenerVersion(Version &version, char *numVersion){
+    int *arrInt;
+    int tope;
+    convertirStringEnArrInt(numVersion, arrInt, tope);
+
+    //si la version buscada es la version padre
+    if (tope == 1){
+        Version aux = version;
+        while (aux != NULL){
+            if (aux->versionRaiz->numeroVersion[0] == arrInt[0])
+                return aux->versionRaiz;
+            aux = aux->sig;
+        }
+        
+    }
+    //sino, es una subversion
+    else {
+        return buscar(version->versionRaiz, arrInt);
+    }
 }
+
+
+
 
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
 //Pos-Cond: Agrega el string texto como la fila num_fila de la Version "version"

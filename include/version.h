@@ -62,7 +62,7 @@ void crearVersion (Version &version, char *num_version);
 
 //Pre-Cond: la Version "numVersion" existe en version
 //Pos-Cond: Retorna un puntero a la version que tiene como numero "numVersion"
-Version obtenerVersion(Version &version, char *numVersion);
+AV obtenerVersion(Version &version, char *numVersion);
 
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
 //Pos-Cond: Agrega el string texto como la fila num_fila de la Version "version"
