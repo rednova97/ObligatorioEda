@@ -99,7 +99,7 @@ int numeroUltimaVersion(Version version);
 ////////////////////////////////// AGREGADA 16/09/2025  ////////////
 //Pre-Cond: No tiene
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
-int numeroUltimaLineaVersion(Version version);
+int numeroUltimaLineaVersion(Version version, char *numeroVersion);
 
 void convertirArregloCharEnArregloInt(char *string, int *&numero, int &tope);
 

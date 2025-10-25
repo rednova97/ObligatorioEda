@@ -33,7 +33,7 @@ Version crearVersionVacia(){
 
 
 //pre-cond: no tiene
-//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos 
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos. Si el string es 1.2.1 lo convierte a 1 2 1 
 void convertirStringEnArrInt(char *string, int *&numero, int &tope){
     //contamos la cantidad de puntos
     int largo = strlen(string);
@@ -43,10 +43,7 @@ void convertirStringEnArrInt(char *string, int *&numero, int &tope){
             puntos++;
     }
 
-    //calculo del tope
     tope = puntos;
-
-    //arreglo dinamico para almacenar los numeros
     numero = new int[tope+1];
 
     int nivel=0;        //indice dentro del arreglo, representa el nivel dentro del arbol
@@ -264,14 +261,11 @@ AV obtenerVersion(Version &version, char *numVersion){
 }
 
 
-
-
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
-//Pos-Cond: Agrega el string texto como la fila num_fila de la Version "version"
-//          Las filas debajo de num_lineas se renumeran como numLinea=numLinea+1
+//Pos-Cond: Agrega el string textoFila como la fila numLinea de la Version "version". Las filas debajo de num_lineas se renumeran como numLinea=numLinea+1
 void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,unsigned int numLinea){
-    Version aux = obtenerVersion(version, numeroVersion);   //obtenemos la version donde vamos a insertar el string texto
-    insertarLinea(aux->linea, textoFila, numLinea);     //insertamos la linea en la version y reenumeramos las siguientes por debajo (si hay)
+    AV aux = obtenerVersion(version, numeroVersion);        //obtenemos la version donde vamos a insertar el string texto
+    insertarLinea(aux->linea, textoFila, numLinea);         //insertamos la linea en la version y reenumeramos las siguientes por debajo (si hay)   
 }
 
 
@@ -279,14 +273,14 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
 void imprimirVersion(Version version, char* numeroVersion){
-    printf("%s \n", version->nombreVersion);
+    printf("%d \n", numeroVersion);
     printf("\n");
-    int cant = numeroUltimaLineaVersion(version);     //cantidad de lineas en la version
+    int cant = numeroUltimaLineaVersion(version, numeroVersion);       //cantidad de lineas en la version
     if (cant == 0)
         printf("No contiene lineas.\n");
     else {
         for (int i=1; i<=cant; i++){
-            char* renglon = obtenerTextoLinea(version->linea, i);
+            char* renglon = obtenerTextoLinea(version->versionRaiz->linea, i);
             printf("%d    %s\n", i, renglon);
             delete [] renglon;
         }
@@ -301,10 +295,10 @@ Version siguienteVersion(Version version){
 
 //Pre-Cond: version !=NULL
 //Pos-Cond: retorna un puntero a un arreglo dinamico con el numero de la Version "version"
-char* nombreVersion(Version version){
-    int len = strlen(version->nombreVersion);
+char* nombreVersion(char *numeroVersion){
+    int len = strlen(numeroVersion);
     char *resultado = new char[len + 1];
-    strcpy(resultado, version->nombreVersion);
+    strcpy(resultado, numeroVersion);
     return resultado;
 }
 
@@ -319,9 +313,10 @@ int numeroUltimaVersion(Version version){
 
 //Pre-Cond: No tiene
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
-int numeroUltimaLineaVersion(Version version){
-    if (version != NULL)
-        return cantidadLineas(version->linea);    
+int numeroUltimaLineaVersion(Version version, char *numeroVersion){
+    AV ver = obtenerVersion(version, numeroVersion);
+    if (ver != NULL)
+        return cantidadLineas(ver->linea);
     else
         return 0;
 }
