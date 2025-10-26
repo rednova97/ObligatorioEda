@@ -22,8 +22,9 @@ typedef struct _rep_version *Version;
 //Pos-Cond: Retorna una version vacia
 Version crearVersionVacia();
 
+
 //pre-cond: no tiene
-//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros, eliminando los puntos 
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos. Si el string es 1.2.1 lo convierte a 1 2 1 
 void convertirStringEnArrInt(char *string, int *&numero, int &tope);
 
 //Pre-cond: no tiene
@@ -34,9 +35,6 @@ void copiarArreglo(int *origen, int *destino, int n);
 //pos-cond: crea un nodo con numero de version "numeroVersion" y tope "tope"
 AV crearNodo(int *numeroVersion, int tope);
 
-//Pre-cond: no tiene
-//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
-AV buscar(AV t, int *numeroVersion, int tope);
 
 //Pre-cond: no tiene
 //Pos-cond: inserta el nodo nuevo en el arbol actual
@@ -51,61 +49,54 @@ void renumeracionAscendente(AV t, int pos);
 //pos-cond: reenumera los hijos y hermanos de la version t como t - 1 a partir de la posicion pos
 void renumeracionDescendente(AV t, int pos);
 
-//Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de
-//			la Version "version" 
-//Pos-Cond: Crea una nueva version con el numero de verion "num_version
-//			Las versiones iguales y mayores a num_version se les suma 1 al numero de version.
-void crearVersion (Version &version, char *num_version);
+
+//Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
+//Pos-Cond: Crea una nueva version con el numero de verion "num_version. Las versiones iguales y mayores a num_version se les suma 1 al numero de version, lo mismo con
+void crearVersion (Version &version, char *num_version); 
 
 
 //************************ SELECTORAS ********************* */
 
-//Pre-Cond: la Version "numVersion" existe en version
-//Pos-Cond: Retorna un puntero a la version que tiene como numero "numVersion"
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
+AV buscar(AV t, int *numeroVersion, int tope);
+
+//Pre-Cond: la version numVersion existe en version
+//Pos-Cond: Retorna un puntero a la version de nombre "numVersion"
 AV obtenerVersion(Version &version, char *numVersion);
 
+
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
-//Pos-Cond: Agrega el string texto como la fila num_fila de la Version "version"
-//          Las filas debajo de num_filas se renumeran como numLinea=numLinea+1
+//Pos-Cond: Agrega el string textoFila como la fila numLinea de la Version "version". Las filas debajo de num_lineas se renumeran como numLinea=numLinea+1
 void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,unsigned int numLinea);
 
-//Pre-cond: no tiene
-//Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
-AV buscar(AV t, int *nombreVersion);
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
-//Pos-Cond: Imprime la Version "nombreVersion"
+//Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
 void imprimirVersion(Version version, char* numeroVersion);
 
-
-////////////////////////////////// AGREGADA 05/09/2025  ////////////
 //Pre-Cond: version != NULL
 //Pos-Cond: retorna un puntero a la siguiente Version de "version"
 Version siguienteVersion(Version version);
 
-////////////////////////////////// AGREGADA 05/09/2025  ////////////
 //Pre-Cond: version !=NULL
 //Pos-Cond: retorna un puntero a un arreglo dinamico con el numero de la Version "version"
-char* nombreVersion(Version version);
+char* nombreVersion(char *numeroVersion);
+
+//pos-cond: devuelve el nodo mas a la derecha de un arbol finitario
+AV ultimoNodoDerecha(AV t);
 
 
-////////////////////////////////// AGREGADA 16/09/2025  ////////////
 //Pre-Cond: (!esVaciaVersion(version)) retorna true
 //Pos-Cond: retorna un entero con el numero de la ultima verison que hay en la Version "version"
-
 int numeroUltimaVersion(Version version);
 
 
-////////////////////////////////// AGREGADA 16/09/2025  ////////////
 //Pre-Cond: No tiene
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
-int numeroUltimaLineaVersion(Version version, char *numeroVersion);
-
-void convertirArregloCharEnArregloInt(char *string, int *&numero, int &tope);
+int numeroUltimaLineaVersion(AV ver, char *numeroVersion);
 
 //********************* PREDICADOS ************************* */
-
-//********** MODIFICADO 15/09/2025******************************
 //pre-cond:No tiene
 //pos-cond:Retorna true si la Version "version" es vacia.
 bool esVaciaVersion (Version version);
@@ -113,34 +104,36 @@ bool esVaciaVersion (Version version);
 //Retorna true si la Version "numeroVersion" existe en "version"
 bool existeVersion (Version version, char* numeroVersion);
 
-//pre-cond: no tiene
-//pos-cond: devuelve TRUE si a y b son iguales
+//pre-cond: a y b tienen el mismo tamanio
+//pos-cond: devuelve true si a y b son iguales
 bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB);
 
-//pre-cond: no tiene
-//pos-cond: devuelve TRUE si a esta en un nivel superior a b
 bool esAnterior(int *a, int *b, int sizeA, int sizeB);
-
-
 
 
 
 //****************  DESTRUCTORAS ***********************
 
-//Pre-Cond: la Linea "numLinea" existe en la version "version"
-//Pos-Cond: se elimina la Linea de la posicion "numLinea"
-//          el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
+//Pre-Cond: la version "numeroVersion" existe y la Linea "numLinea" existe en la version "version"
+//Pos-Cond: se elimina la Linea de la posicion "numLinea" el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
 void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int numLinea);
+//Pos-cond: elimina los hijos de un arbol
+void eliminarSoloHijos(AV &t);
+
+//pos-cond: elimina un arbol completamente
+void eliminarAV(AV &t);
+
+
+//pre-cond: la subversion a eliminar existe
+//pos-cond: elimina una subversion y sus hijas
+void eliminarSubVersion(AV &nodoVer, AV subVersion);
 
 //Pre-Cond: la version "numeroVersion" existe en version
-//Pos-Cond: elimina toda la mermoria reservada por "numeroVersion"
-//          y sus sub-versiones.
+//Pos-Cond: elimina toda la mermoria reservada por "numeroVersion". Reenumera las siguientes versiones
 void destruirVersion (Version &version, char* numeroVersion);
 
-////////////////////////////////// AGREGADA 05/09/2025  ////////////
 //Pre-Cond: No tiene
 //Pos-Cond: Elimina toda la memoria reservada por "version"
 void destruirTodasLasVersiones(Version &version);
-
 
 #endif

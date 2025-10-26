@@ -223,11 +223,11 @@ AV buscar(AV t, int *numeroVersion, int tope){
         return NULL;
     else {
         if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope, tope)){
-            AV esta_SH = buscar(t->sH, numeroVersion);
+            AV esta_SH = buscar(t->sH, numeroVersion, tope);
             if (esta_SH != NULL)
                 return esta_SH;
             else
-                return buscar(t->pH, numeroVersion);
+                return buscar(t->pH, numeroVersion, tope);
         }
         else 
             return t;
@@ -273,7 +273,7 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 void imprimirVersion(Version version, char* numeroVersion){
     printf("%d \n", numeroVersion);
     printf("\n");
-    int cant = numeroUltimaLineaVersion(version, numeroVersion);       //cantidad de lineas en la version
+    int cant = numeroUltimaLineaVersion(version->versionRaiz, numeroVersion);       //cantidad de lineas en la version
     if (cant == 0)
         printf("No contiene lineas.\n");
     else {
@@ -322,7 +322,7 @@ AV ultimoNodoDerecha(AV t){
 int numeroUltimaVersion(Version version){
     while(version->sig != NULL)    
         version = siguienteVersion(version);
-    return atoi(nombreVersion(version));
+    return version->versionRaiz->numeroVersion[0];
 }
 
 
