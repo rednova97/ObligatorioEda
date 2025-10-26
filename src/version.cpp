@@ -156,7 +156,7 @@ void crearVersion (Version &version, char *num_version){
     //si el tope es 0 quiere decir que queremos ingresar una nueva version raiz
     if (tope == 0){           
         //si entramos aca quiere decir que la version que queremos ingresar ya existe
-        if (aux->versionRaiz->numeroVersion[0] == aBuscar){  
+        if ( aux != NULL && aux->versionRaiz->numeroVersion[0] == aBuscar){  
             //insertamos al comienzo de la lista de versiones
             if (aBuscar == 1){                
                 Version nueva = new _rep_version;
@@ -189,15 +189,25 @@ void crearVersion (Version &version, char *num_version){
             }
 
         }
-        //si entramos aca es porque esa version no existe y por lo tanto, vamos a insertar al final
-        else {                      
-            Version temp = version;
-            while (temp->sig != NULL)
-                temp = temp->sig;
-            Version nueva = new _rep_version;
-            nueva->versionRaiz = crearNodo(numVer, tope + 1);
-            nueva->sig = NULL;
-            temp->sig = NULL;
+        //sino 
+        else { 
+            //si la lista de versiones esta vacia                     
+            if (version == NULL){
+                Version nueva = new _rep_version;
+                nueva->versionRaiz = crearNodo(numVer, tope + 1);
+                nueva->sig = NULL;
+                version = nueva;
+            }
+            //sino, insertamos al final
+            else {
+                Version temp = version;
+                while (temp->sig != NULL)
+                    temp = temp->sig;
+                Version nueva = new _rep_version;
+                nueva->versionRaiz = crearNodo(numVer, tope + 1);
+                nueva->sig = NULL;
+                temp->sig = nueva;
+            }
         }
     }
     //sino, vamos a insertar una subversion
