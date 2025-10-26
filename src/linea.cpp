@@ -115,8 +115,8 @@ char* obtenerTextoLinea (Linea linea, unsigned int numLinea){
     return convertirCadenaArregloChar(linea->texto); 
 }
 
-//pos-cond: devuelve una copia de la linea "linea" sin compartir memoria
-Linea copiarLinea(Linea linea){
+//pos-cond: devuelve una copia de todas las lineas sin compartir memoria
+Linea copiarLineas(Linea linea){
     Linea copia = crearLineaVacia();
     Linea aux = linea;
     unsigned int pos = 1;

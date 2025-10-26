@@ -71,7 +71,7 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 
 //Pre-cond: no tiene
 //Pos-cond: devuelve un puneto al numero de version, si no existe, devuelve NULL
-AV buscar(AV t, char *nombreVersion);
+AV buscar(AV t, int *nombreVersion);
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "nombreVersion"

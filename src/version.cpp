@@ -139,15 +139,12 @@ void renumeracionDescendente(AV t, int pos){
 }
 
 
-
-
-
-
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version. Las versiones iguales y mayores a num_version se les suma 1 al numero de version, lo mismo con
 void crearVersion (Version &version, char *num_version){
     int *numVer = new int;
-    convertirStringEnArrInt(num_version, numVer, version->versionRaiz->tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
+    int tope;
+    convertirStringEnArrInt(num_version, numVer, tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
 
     int aBuscar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
     Version aux = version;
@@ -155,14 +152,15 @@ void crearVersion (Version &version, char *num_version){
     while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aBuscar))
         aux = aux->sig;
     
-    //si el tamaño es 1 quiere decir que queremos ingresar una nueva version raiz
-    if (sizeof(numVer) == 1){           
+    
+    //si el tope es 0 quiere decir que queremos ingresar una nueva version raiz
+    if (tope == 0){           
         //si entramos aca quiere decir que la version que queremos ingresar ya existe
         if (aux->versionRaiz->numeroVersion[0] == aBuscar){  
             //insertamos al comienzo de la lista de versiones
             if (aBuscar == 1){                
                 Version nueva = new _rep_version;
-                nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
+                nueva->versionRaiz = crearNodo(numVer, tope + 1);
                 nueva->sig = version;
                 version = nueva;
 
@@ -180,7 +178,7 @@ void crearVersion (Version &version, char *num_version){
                     cont++;
                 }
                 Version nueva = new _rep_version;
-                nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
+                nueva->versionRaiz = crearNodo(numVer, tope + 1);
                 nueva->sig = temp->sig;
                 temp->sig = nueva;
 
@@ -197,16 +195,16 @@ void crearVersion (Version &version, char *num_version){
             while (temp->sig != NULL)
                 temp = temp->sig;
             Version nueva = new _rep_version;
-            nueva->versionRaiz = crearNodo(numVer, sizeof(numVer));
+            nueva->versionRaiz = crearNodo(numVer, tope + 1);
             nueva->sig = NULL;
             temp->sig = NULL;
         }
     }
     //sino, vamos a insertar una subversion
     else {
-        AV nuevaSubVer = crearNodo(numVer, sizeof(numVer));
+        AV nuevaSubVer = crearNodo(numVer, tope + 1);
         aux->versionRaiz = insertarSubVersion(aux->versionRaiz, nuevaSubVer);
-        nuevaSubVer->linea = copiarLinea(aux->versionRaiz->linea);
+        nuevaSubVer->linea = copiarLineas(aux->versionRaiz->linea);
         if (nuevaSubVer->sH != NULL)
             renumeracionAscendente(nuevaSubVer->sH, nuevaSubVer->tope);
     }
@@ -330,13 +328,20 @@ bool esVaciaVersion (Version version){
 
 //Retorna true si la Version "numeroVersion" existe en "version"
 bool existeVersion (Version version, char* numeroVersion){
+    int *numVer;
+    int tope;
+    convertirStringEnArrInt(numeroVersion, numVer, tope);
+
+    int aBuscar = numVer[0];
     Version aux = version;
-    while (aux != NULL){
-        if (strcmp(aux->nombreVersion, numeroVersion) == 0)
-            return true;
+    while (aux != NULL && aux->versionRaiz->numeroVersion[0] != aBuscar){
         aux = aux->sig;
     }
-    return false;
+    AV esta = buscar(aux->versionRaiz, numVer);
+    if (esta != NULL)
+        return true;
+    else
+        return false;
 }
 
 //pre-cond: a y b tienen el mismo tamanio
@@ -345,7 +350,7 @@ bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB){
     if (sizeA != sizeB)
         return false;
 
-    for (int i=0; i<topeA; i++){
+    for (int i=0; i<sizeA; i++){
         if (a[i] != b[i])
             return false;
     }
@@ -364,6 +369,8 @@ bool esAnterior(int *a, int *b, int sizeA, int sizeB){
     
 }
 
+
+
 //****************  DESTRUCTORAS ***********************
 
 //Pre-Cond: la version "numeroVersion" existe y la Linea "numLinea" existe en la version "version"
@@ -374,47 +381,104 @@ void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int n
     eliminarLinea(aux->linea, numLinea);
 }
 
+//Pos-cond: elimina los hijos de un arbol
+void eliminarSoloHijos(AV &t){
+    if (t != NULL){
+        eliminarSoloHijos(t->pH);
+        delete t;
+        t = NULL;
+    }
+}
+
+//pos-cond: elimina un arbol completamente
+void eliminarAV(AV &t){
+    if (t != NULL){
+        eliminarAV(t->pH);
+        eliminarAV(t->sH);
+        delete t;
+        t = NULL;
+    }
+}
+
+
+//pre-cond: la subversion a eliminar existe
+//pos-cond: elimina una subversion y sus hijas
+void eliminarSubVersion(AV &nodoVer, AV subVersion){
+    if (nodoVer != NULL && subVersion != NULL){
+        //si estamos en el nodo que queremos borrar
+        if (nodoVer == subVersion){
+            eliminarSoloHijos(nodoVer);
+            nodoVer = NULL;
+        }
+        //sino
+        else {
+            //si lo que queremos borrar esta como primer hijo
+            if (nodoVer->pH == subVersion){
+                AV temp = subVersion->sH;
+                eliminarSoloHijos(nodoVer->pH);
+                nodoVer->pH = temp;
+            }
+            //sino
+            else
+                eliminarSubVersion(nodoVer->pH, subVersion);
+
+            //si lo que queremos borrar esta como siguiente hermano
+            if (nodoVer->sH == subVersion){
+                AV temp = subVersion->sH;
+                eliminarSoloHijos(nodoVer->sH);
+                nodoVer->sH = temp;
+            }
+            //sino
+            else
+                eliminarSubVersion(nodoVer->sH, subVersion);
+        }
+    }
+}
+
 //Pre-Cond: la version "numeroVersion" existe en version
 //Pos-Cond: elimina toda la mermoria reservada por "numeroVersion". Reenumera las siguientes versiones
 void destruirVersion (Version &version, char* numeroVersion){
-    Version temp = obtenerVersion(version, numeroVersion);
+    int *numVer;
+    int tope;
+    convertirStringEnArrInt(numeroVersion, numVer, tope);
+    
+    int aEliminar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
     Version aux = version;
-    int num = atoi(numeroVersion) - 1;
-    int i = 1;
 
-    while (aux != NULL && i < num){
+    while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aEliminar))
         aux = aux->sig;
-        i++;
+    
+    //si tope = 0 queremos borrar una version raiz padre, y por lo tanto, todas sus subversiones
+    if (tope == 0){
+        //si queremos eliminar la version padre 1
+        if (aEliminar == 1){
+            version = version->sig;
+            eliminarAV(aux->versionRaiz);
+            aux->sig = version;
+            while (aux != NULL){
+                renumeracionDescendente(version->versionRaiz, 0);
+                aux = aux->sig;
+        }
+        //sino
+        else {
+            //si lo que queremos borrar esta en el "medio"
+            if (aux->sig != NULL){
+                Version iter = version;
+                
+            }
+        }
+
     }
 
-    //si queremos eliminar la primera version
-    if (temp == version){
-        version = temp->sig;
-        if (version != NULL)
-            version->ant = NULL;
-        aux = aux->sig;
-    }
-    else {
-        aux->sig = temp->sig;
-        if (temp->sig != NULL)          //si queremos eliminar la ultima version, no entramos
-            temp->sig->ant = aux;
-        aux = aux->sig;
-    }
 
-    destruirLinea(temp->linea);
-    delete temp;
-
-    while (aux != NULL){
-        int x = aux->nombreVersion[0] - '0' - 1;
-        
-        delete [] aux->nombreVersion;
-        aux->nombreVersion = new char[MAX_VERSIONES];
-        aux->nombreVersion[0] = x + '0';
-        aux->nombreVersion[1] = '\0';
-        
-        aux = aux->sig;
-    }
 }
+
+
+/*AV nuevaSubVer = crearNodo(numVer, tope + 1);
+        aux->versionRaiz = insertarSubVersion(aux->versionRaiz, nuevaSubVer);
+        nuevaSubVer->linea = copiarLineas(aux->versionRaiz->linea);
+        if (nuevaSubVer->sH != NULL)
+            renumeracionAscendente(nuevaSubVer->sH, nuevaSubVer->tope);*/
 
 ////////////////////////////////// AGREGADA 05/09/2025  ////////////
 //Pre-Cond: No tiene
