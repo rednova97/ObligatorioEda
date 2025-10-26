@@ -73,7 +73,20 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
-void imprimirVersion(Version version, char* numeroVersion);
+void imprimirVersion(AV version, char* numeroVersion);
+
+//imprime un arreglo de enteros
+void imprimirNumeroVersion(int *numero, int tope);
+
+//retorna la cantidad de nuiveles
+int altura(AV t);
+
+
+//pos-cond: imprime todas las subversiones de la version raiz junto con la version raiz
+void imprimirAV(AV t, int nivel);
+
+//pos-cond: imprime todas las versiones con sus respectivas subversiones
+void imprimirTodasLasversiones(Version version);
 
 //Pre-Cond: version != NULL
 //Pos-Cond: retorna un puntero a la siguiente Version de "version"
@@ -81,7 +94,7 @@ Version siguienteVersion(Version version);
 
 //Pre-Cond: version !=NULL
 //Pos-Cond: retorna un puntero a un arreglo dinamico con el numero de la Version "version"
-char* nombreVersion(char *numeroVersion);
+int* nombreVersion(int *numeroVersion, int tope);
 
 //pos-cond: devuelve el nodo mas a la derecha de un arbol finitario
 AV ultimoNodoDerecha(AV t);

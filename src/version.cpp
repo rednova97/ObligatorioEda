@@ -227,7 +227,7 @@ AV buscar(AV t, int *numeroVersion, int tope){
             if (esta_SH != NULL)
                 return esta_SH;
             else
-                return buscar(t->pH, numeroVersion, tope);
+                return buscar(t->pH, numeroVersion,tope);
         }
         else 
             return t;
@@ -270,20 +270,77 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
-void imprimirVersion(Version version, char* numeroVersion){
+void imprimirVersion(AV version, char* numeroVersion){
     printf("%d \n", numeroVersion);
     printf("\n");
-    int cant = numeroUltimaLineaVersion(version->versionRaiz, numeroVersion);       //cantidad de lineas en la version
+    int cant = numeroUltimaLineaVersion(version, numeroVersion);       //cantidad de lineas en la version
     if (cant == 0)
         printf("No contiene lineas.\n");
     else {
         for (int i=1; i<=cant; i++){
-            char* renglon = obtenerTextoLinea(version->versionRaiz->linea, i);
+            char* renglon = obtenerTextoLinea(version->linea, i);
             printf("%d    %s\n", i, renglon);
             delete [] renglon;
         }
     }  
 }
+
+//imprime un arreglo de enteros
+void imprimirNumeroVersion(int *numero, int tope){
+    for (int i = 0; i <= tope; i++){
+        printf("%d", numero[i]);
+        if (i < tope)
+            printf(".");
+    }
+    printf("\n");
+}
+
+
+//devuelve el maximo entre 2 numeros enteros
+int maximo(int a, int b){
+    if (a >= b)
+        return a;
+    else
+        return b;
+}
+
+//retorna la cantidad de niveles de un arbol
+int altura(AV t){
+    if (t == NULL)
+        return 0;
+    else
+        return maximo(1 + altura(t->pH), altura(t->sH));
+}
+
+//imprime tabuladores
+void imprimirTabs(int n){
+    while (n > 1){
+        printf("\t");
+        n--;
+    }
+}
+
+
+//pos-cond: imprime todas las subversiones de la version raiz
+void imprimirAV(AV t, int nivel){
+    if (t != NULL){
+        imprimirTabs(nivel);
+        imprimirNumeroVersion(t->numeroVersion, t->tope);
+        imprimirAV(t->pH, nivel + 1);
+        imprimirAV(t->sH, nivel);
+    }
+}
+
+//pos-cond: imprime todas las versiones con sus respectivas subversiones
+void imprimirTodasLasversiones(Version version){
+    Version aux = version;
+    while (aux != NULL){
+        int nivel = altura(aux->versionRaiz);
+        imprimirAV(aux->versionRaiz, nivel);
+        aux = aux->sig;
+    }
+}
+
 
 //Pre-Cond: version != NULL
 //Pos-Cond: retorna un puntero a la siguiente Version de "version"
@@ -293,10 +350,9 @@ Version siguienteVersion(Version version){
 
 //Pre-Cond: version !=NULL
 //Pos-Cond: retorna un puntero a un arreglo dinamico con el numero de la Version "version"
-char* nombreVersion(char *numeroVersion){
-    int len = strlen(numeroVersion);
-    char *resultado = new char[len + 1];
-    strcpy(resultado, numeroVersion);
+int* nombreVersion(int *numeroVersion, int tope){
+    int *resultado = new int[tope + 1];
+    copiarArreglo(numeroVersion, resultado, tope + 1);
     return resultado;
 }
 

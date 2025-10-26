@@ -53,11 +53,7 @@ char* obtenerNombreArchivo(Archivo archivo){
 //Pos-Cond: imprime todas las versiones de un archivo
 void mostrarVersionesArchivo(Archivo archivo){
     Version version = archivo->version;
-    while (version != NULL){
-        char* nombre = nombreVersion(version);
-        printf("%s \n", nombre);
-        version = siguienteVersion(version);
-    }
+    imprimirTodasLasversiones(version);
 }
 
 //Pre-cond: La version "version" tiene por lo menos "num_fila" de Filas
@@ -70,7 +66,7 @@ void insertarLineaVersionDeArchivo (Archivo &archivo, char* numeroVersion, char 
 
 //Pre-Cond: la version numeroVersion existe en Version 
 //Pos-Cond: Imprime la Version "numeroVersion"
-void imprimirVersionArchivo (Archivo archivo, char* numeroVersion){
+/*void imprimirVersionArchivo (Archivo archivo, char* numeroVersion){
     Version version = archivo->version;
 
     int num = atoi(numeroVersion);
@@ -80,6 +76,7 @@ void imprimirVersionArchivo (Archivo archivo, char* numeroVersion){
     char* nombre = nombreVersion(version);
     printf("%s\n", nombre);
 }
+    */
 
 //Pre-Cond: Tiene version padre.
 //Pos-Cond: Imprime los cambios realizados en la version numeroVersion con respecto al padre.
@@ -112,7 +109,7 @@ unsigned int numeroUltimaVersionArchivo (Archivo archivo){
 //Pos-Cond: Retorna el numero de la ultima linea de la Version "nombreVersion"
 unsigned int numeroUltimaLinea (Archivo archivo, char* nombreVersion){
     AV ver = obtenerVersion(archivo->version, nombreVersion);
-    return numeroUltimaLineaVersion(archivo->version, nombreVersion);
+    return numeroUltimaLineaVersion(ver, nombreVersion);
 }
 
 
