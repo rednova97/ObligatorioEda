@@ -142,14 +142,14 @@ void renumeracionDescendente(AV t, int pos){
 //Pre-Cond: num_version tiene que estar en el rango de 1 o la ultima version + 1 de	la Version "version" 
 //Pos-Cond: Crea una nueva version con el numero de verion "num_version. Las versiones iguales y mayores a num_version se les suma 1 al numero de version, lo mismo con
 void crearVersion (Version &version, char *num_version){
-    int *numVer = new int;
+    int *numVer = NULL;
     int tope;
     convertirStringEnArrInt(num_version, numVer, tope);   //convertimos el char *num_ver a un arreglo de enteros int *numVer
 
     int aBuscar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
     Version aux = version;
 
-    while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aBuscar))
+    while ((aux != NULL) && (aux->versionRaiz->numeroVersion[0] != aBuscar))
         aux = aux->sig;
     
     
