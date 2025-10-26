@@ -36,7 +36,7 @@ AV crearNodo(int *numeroVersion, int tope);
 
 //Pre-cond: no tiene
 //Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
-AV buscar(AV t, int *numeroVersion);
+AV buscar(AV t, int *numeroVersion, int tope);
 
 //Pre-cond: no tiene
 //Pos-cond: inserta el nodo nuevo en el arbol actual

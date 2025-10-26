@@ -89,7 +89,7 @@ void mostrarCambiosArchivo (Archivo archivo, char* numeroVersion);
 //Pre-Cond: La Version "numeroVersion" existe en el Archivo "archivo".
 //Pos-Cond: Imprime el texto correspondiente a la version "numeroVersion"
 void mostrarTextoArchivoVersion (Archivo archivo, char* numeroVersion){
-    Version version = obtenerVersion(archivo->version, numeroVersion);      //obtenemos la version de la cual queremos imprimir el texto
+    AV version = obtenerVersion(archivo->version, numeroVersion);      //obtenemos la version de la cual queremos imprimir el texto
     printf("%s - ", archivo->nombre);
     imprimirVersion(version, numeroVersion);
     printf("\n");
@@ -111,8 +111,8 @@ unsigned int numeroUltimaVersionArchivo (Archivo archivo){
 //Pre-Cond: Existe la version "nombreVersion" en el Archivo "archivo".
 //Pos-Cond: Retorna el numero de la ultima linea de la Version "nombreVersion"
 unsigned int numeroUltimaLinea (Archivo archivo, char* nombreVersion){
-    Version ver = obtenerVersion(archivo->version, nombreVersion);
-    return numeroUltimaLineaVersion(ver);
+    AV ver = obtenerVersion(archivo->version, nombreVersion);
+    return numeroUltimaLineaVersion(archivo->version, nombreVersion);
 }
 
 

@@ -218,11 +218,11 @@ void crearVersion (Version &version, char *num_version){
 
 //Pre-cond: no tiene
 //Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
-AV buscar(AV t, int *numeroVersion){
+AV buscar(AV t, int *numeroVersion, int tope){
     if (t == NULL)
         return NULL;
     else {
-        if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope)){
+        if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope, tope)){
             AV esta_SH = buscar(t->sH, numeroVersion);
             if (esta_SH != NULL)
                 return esta_SH;
@@ -254,7 +254,7 @@ AV obtenerVersion(Version &version, char *numVersion){
     }
     //sino, es una subversion
     else {
-        return buscar(version->versionRaiz, arrInt);
+        return buscar(version->versionRaiz, arrInt, tope);
     }
 }
 
@@ -300,6 +300,23 @@ char* nombreVersion(char *numeroVersion){
     return resultado;
 }
 
+
+//pos-cond: devuelve el nodo mas a la derecha de un arbol finitario
+AV ultimoNodoDerecha(AV t){
+    AV res = NULL;
+    if (t != NULL) {
+        if (t->sH != NULL)
+            res = ultimoNodoDerecha(t->sH);
+        else if (t->pH != NULL)
+            res = ultimoNodoDerecha(t->pH);
+        else
+            res = t;
+    }
+    return res;
+}
+
+
+
 //Pre-Cond: (!esVaciaVersion(version)) retorna true
 //Pos-Cond: retorna un entero con el numero de la ultima verison que hay en la Version "version"
 int numeroUltimaVersion(Version version){
@@ -311,8 +328,7 @@ int numeroUltimaVersion(Version version){
 
 //Pre-Cond: No tiene
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
-int numeroUltimaLineaVersion(Version version, char *numeroVersion){
-    AV ver = obtenerVersion(version, numeroVersion);
+int numeroUltimaLineaVersion(AV ver, char *numeroVersion){
     if (ver != NULL)
         return cantidadLineas(ver->linea);
     else
@@ -337,7 +353,7 @@ bool existeVersion (Version version, char* numeroVersion){
     while (aux != NULL && aux->versionRaiz->numeroVersion[0] != aBuscar){
         aux = aux->sig;
     }
-    AV esta = buscar(aux->versionRaiz, numVer);
+    AV esta = buscar(aux->versionRaiz, numVer, tope);
     if (esta != NULL)
         return true;
     else
@@ -374,10 +390,9 @@ bool esAnterior(int *a, int *b, int sizeA, int sizeB){
 //****************  DESTRUCTORAS ***********************
 
 //Pre-Cond: la version "numeroVersion" existe y la Linea "numLinea" existe en la version "version"
-//Pos-Cond: se elimina la Linea de la posicion "numLinea"
-//          el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
+//Pos-Cond: se elimina la Linea de la posicion "numLinea" el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
 void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int numLinea){
-    Version aux = obtenerVersion(version, numeroVersion);
+    AV aux = obtenerVersion(version, numeroVersion);
     eliminarLinea(aux->linea, numLinea);
 }
 
@@ -454,36 +469,61 @@ void destruirVersion (Version &version, char* numeroVersion){
         if (aEliminar == 1){
             version = version->sig;
             eliminarAV(aux->versionRaiz);
+            delete aux;
             aux->sig = version;
             while (aux != NULL){
                 renumeracionDescendente(version->versionRaiz, 0);
                 aux = aux->sig;
+            }
         }
         //sino
         else {
             //si lo que queremos borrar esta en el "medio"
             if (aux->sig != NULL){
                 Version iter = version;
-                
+                while (iter->sig != aux)
+                    iter = iter->sig;
+                eliminarAV(aux->versionRaiz);
+                iter->sig = aux->sig;
+                delete aux;
+                aux = iter->sig;
+                while(aux != NULL){
+                    renumeracionDescendente(aux->versionRaiz, 0);
+                    aux = aux->sig;
+                }
+            }
+            //sino, esta al final
+            if (aux == NULL){
+                Version iter = version;
+                while (iter->sig->sig != NULL)
+                    iter = iter->sig;
+                aux = iter->sig;
+                eliminarAV(aux->versionRaiz);
+                iter->sig = NULL;
+                delete aux;
             }
         }
 
     }
-
-
+    //sino, vamos a eliminar una subversion
+    else {
+        //buscamos la subversion a eliminar
+        AV aBorrar = buscar(aux->versionRaiz, numVer, tope);
+        eliminarSubVersion(aux->versionRaiz, aBorrar);
+        if (aBorrar->sH != NULL)
+            renumeracionDescendente(aBorrar->sH, aBorrar->tope);
+    }
+    delete[] numVer;
 }
 
 
-/*AV nuevaSubVer = crearNodo(numVer, tope + 1);
-        aux->versionRaiz = insertarSubVersion(aux->versionRaiz, nuevaSubVer);
-        nuevaSubVer->linea = copiarLineas(aux->versionRaiz->linea);
-        if (nuevaSubVer->sH != NULL)
-            renumeracionAscendente(nuevaSubVer->sH, nuevaSubVer->tope);*/
-
-////////////////////////////////// AGREGADA 05/09/2025  ////////////
 //Pre-Cond: No tiene
 //Pos-Cond: Elimina toda la memoria reservada por "version"
-void destruirTodasLasVersiones(Version &version){    
-    while (!esVaciaVersion(version))
-        destruirVersion(version, version->nombreVersion);
+void destruirTodasLasVersiones(Version &version){  
+    if (version != NULL) {
+        eliminarAV(version->versionRaiz);
+        destruirTodasLasVersiones(version->sig);
+        delete version;
+        version = NULL;
+    }
 }
