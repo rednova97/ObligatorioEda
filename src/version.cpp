@@ -250,6 +250,7 @@ AV obtenerVersion(Version &version, char *numVersion){
                 return aux->versionRaiz;
             aux = aux->sig;
         }
+        return NULL;
         
     }
     //sino, es una subversion
@@ -271,7 +272,7 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
 void imprimirVersion(AV version, char* numeroVersion){
-    printf("%d \n", numeroVersion);
+    printf("%s \n", numeroVersion);
     printf("\n");
     int cant = numeroUltimaLineaVersion(version, numeroVersion);       //cantidad de lineas en la version
     if (cant == 0)
