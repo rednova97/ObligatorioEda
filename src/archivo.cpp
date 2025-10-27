@@ -113,6 +113,7 @@ unsigned int numeroUltimaLinea (Archivo archivo, char* nombreVersion){
 }
 
 
+
 //********************* PREDICADOS ************************* */
 
 //Pos-Cond: Retorna true si la Version "numeroVersion1" es igual a la version "numeroVersion2"
@@ -124,6 +125,16 @@ bool igualesVersionesArchivo (Archivo archivo, char* numeroVersion1, char* numer
 //Pos-Cond: Retorna true si la Version "numeroVersion" existe en el Archivo "archivo"
 bool existeVersionEnArchivo(Archivo archivo, char* numeroVersion){
     return existeVersion(archivo->version, numeroVersion);
+}
+
+//Pos-cond: retorna true si la subversion anterior a "numeroVersion" existe en el archivo "archivo"
+bool existeSubversionHermanaAnteriorEnArchivo(Archivo archivo, char* numeroVersion){
+    return existeSubversionHermanaAnterior(archivo->version, numeroVersion);
+}
+
+//pos-cond: devuelve true si la version padre a la version numeroVersion existe
+bool existePadreEnArchivo(Archivo archivo, char* numeroVersion){
+    return existePadre(archivo->version, numeroVersion);
 }
 
 

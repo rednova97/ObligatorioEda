@@ -121,7 +121,13 @@ bool existeVersion (Version version, char* numeroVersion);
 //pos-cond: devuelve true si a y b son iguales
 bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB);
 
-bool esAnterior(int *a, int *b, int sizeA, int sizeB);
+bool esPadre(int *a, int *b, int sizeA, int sizeB);
+
+//pos-cond: devuelve true si la subversion anterior a numeroVersion existe
+bool existeSubversionHermanaAnterior(Version version, char* numeroVersion);
+
+//pos-cond: devuelve true si existe la version padre de numeroVersion
+bool existePadre(Version version, char* numeroVersion);
 
 
 
