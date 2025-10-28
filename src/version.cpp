@@ -8,6 +8,71 @@
 #define MAX_VERSIONES 10
 
 
+//*****************  FUNCIONES AUXILIARES **************************/
+//pre-cond: no tiene
+//pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos. Si el string es 1.2.1 lo convierte a 1 2 1 
+void convertirStringEnArrInt(char *string, int *&numero, int &tope);
+
+//Pre-cond: no tiene
+//pos-cond: copia el arreglo origen en el arreglo destino
+void copiarArreglo(int *origen, int *destino, int n);
+
+//pre-cond: no tiene
+//pos-cond: crea un nodo con numero de version "numeroVersion" y tope "tope"
+AV crearNodo(int *numeroVersion, int tope);
+
+//Pre-cond: no tiene
+//Pos-cond: inserta el nodo nuevo en el arbol actual
+AV insertarSubVersion(AV actual, AV nuevo);
+
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t + 1 a partir de la posicion pos
+void renumeracionAscendente(AV t, int pos);
+
+//pre-cond: no tiene
+//pos-cond: reenumera los hijos y hermanos de la version t como t - 1 a partir de la posicion pos
+void renumeracionDescendente(AV t, int pos);
+
+//Pre-cond: no tiene
+//Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
+AV buscar(AV t, int *numeroVersion, int tope);
+
+//devuelve el maximo entre 2 numeros enteros
+int maximo(int a, int b);
+
+//retorna la cantidad de niveles de un arbol
+int altura(AV t);
+
+//imprime tabuladores
+void imprimirTabs(int n);
+
+//pos-cond: imprime todas las subversiones de la version raiz
+void imprimirAV(AV t, int nivel);
+
+//pos-cond: devuelve el nodo mas a la derecha de un arbol finitario
+AV ultimoNodoDerecha(AV t);
+
+//pre-cond: a y b tienen el mismo tamanio
+//pos-cond: devuelve true si a y b son iguales
+bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB);
+
+//devuelve true si el arreglo "a" es padre de "b"
+bool esPadre(int *a, int *b, int sizeA, int sizeB);
+
+
+//pos-cond: devuelve truE si la subversion anterior a numeroVersion existe
+bool tieneHermanaAnterior(Version version, char* numeroVersion);
+
+//pos-cond: devuelve true si existe la version padre de la subversion numeroVersion
+bool tienePadre(Version version, char* numeroVersion);
+
+//Pos-cond: elimina los hijos de un arbol
+void eliminarSoloHijos(AV &t);
+
+//pos-cond: elimina un arbol completamente
+void eliminarAV(AV &t);
+
+//***************** FIN FUNCIONES AUXILIARES****** */
 
 
 struct nodoAV {
@@ -23,6 +88,7 @@ struct _rep_version {
     AV versionRaiz;
     _rep_version *sig;
 };
+
 
 //***********************  CONSTRUCTORAS ***************** */
 
@@ -255,9 +321,6 @@ void crearVersion (Version &version, char *num_version){
 
 
 
-
-
-
 //************************ SELECTORAS ********************* */
 
 //Pre-cond: no tiene
@@ -414,8 +477,6 @@ AV ultimoNodoDerecha(AV t){
     return res;
 }
 
-
-
 //Pre-Cond: (!esVaciaVersion(version)) retorna true
 //Pos-Cond: retorna un entero con el numero de la ultima verison que hay en la Version "version"
 int numeroUltimaVersion(Version version){
@@ -559,6 +620,9 @@ bool puedeInsertarVersion(Version version, char* numeroVersion){
 
     //si es raiz
     if (esRaiz){
+        if (version == NULL){
+            return (atoi(numeroVersion) == 1);
+        }
         unsigned int ult = numeroUltimaVersion(version) + 1;    //obtenemos el numero de ultima version del archivo y le sumamos 1
         int versionNum = atoi(numeroVersion);
         if (versionNum >= 1 && versionNum <= (int)ult)
