@@ -239,35 +239,12 @@ TipoRet borrarArchivo(Archivo &a){
 }
 
 TipoRet crearVersion(Archivo &a, char * version){
-    bool esRaiz = true;
-    for (int i = 0; version[i] != '\0' && esRaiz; i++){
-        if (version[i] == '.')
-            esRaiz = false;
+    if (puedeInsertarVersionEnArchivo(a, version)){
+        crearVersionArchivo(a, version);
+        return OK;
     }
-
-    //si es raiz
-    if (esRaiz){
-        unsigned int ult = numeroUltimaVersionArchivo(a) + 1;    //obtenemos el numero de ultima version del archivo y le sumamos 1
-        int versionNum = atoi(version);
-        if (versionNum >= 1 && versionNum <= (int)ult){
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-        else
-            return ERROR;
-    }
-    else {
-        if (existeVersionEnArchivo(a, version)){
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-        else if (!existePadreEnArchivo(a, version) || !existeSubversionHermanaAnteriorEnArchivo(a, version))
-            return ERROR;
-        else {
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-    }
+    else
+        return ERROR;
 }
 
 TipoRet borrarVersion(Archivo &a, char * version){

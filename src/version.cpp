@@ -487,7 +487,7 @@ bool esPadre(int *a, int *b, int sizeA, int sizeB){
 
 
 //pos-cond: devuelve truE si la subversion anterior a numeroVersion existe
-bool existeSubversionHermanaAnterior(Version version, char* numeroVersion){
+bool tieneHermanaAnterior(Version version, char* numeroVersion){
     int *numVer = NULL;
     int tope;
     convertirStringEnArrInt(numeroVersion, numVer, tope);
@@ -518,7 +518,7 @@ bool existeSubversionHermanaAnterior(Version version, char* numeroVersion){
 }
 
 //pos-cond: devuelve true si existe la version padre de la subversion numeroVersion
-bool existePadre(Version version, char* numeroVersion){
+bool tienePadre(Version version, char* numeroVersion){
     int *numVer = NULL;
     int tope;
     convertirStringEnArrInt(numeroVersion, numVer, tope);
@@ -546,6 +546,81 @@ bool existePadre(Version version, char* numeroVersion){
 
     return existe;
 }
+
+//pre-cond: no tiene
+//pos-cond: devuelve TRUE si se puede insertar la version numeroVersion
+bool puedeInsertarVersion(Version version, char* numeroVersion){
+    bool esRaiz = true;
+
+    for (int i = 0; numeroVersion[i] != '\0' && esRaiz; i++){
+        if (numeroVersion[i] == '.')
+            esRaiz = false;
+    }
+
+    //si es raiz
+    if (esRaiz){
+        unsigned int ult = numeroUltimaVersion(version) + 1;    //obtenemos el numero de ultima version del archivo y le sumamos 1
+        int versionNum = atoi(numeroVersion);
+        if (versionNum >= 1 && versionNum <= (int)ult)
+            return true;
+        else 
+            return false;
+    }
+    else {
+        if (existeVersion(version, numeroVersion))
+            return true;
+        if (!tienePadre(version, numeroVersion))
+            return false;
+        
+        int *numVer = NULL;
+        int tope;
+        convertirStringEnArrInt(numeroVersion, numVer, tope);
+
+        if (numVer[tope] >= 2 && !tieneHermanaAnterior(version, numeroVersion)){
+            delete[] numVer;
+            return false;
+        }
+        else {
+            delete[] numVer;
+            return true;
+        }
+
+        
+    }
+}
+
+
+/*TipoRet crearVersion(Archivo &a, char * version){
+    bool esRaiz = true;
+    for (int i = 0; version[i] != '\0' && esRaiz; i++){
+        if (version[i] == '.')
+            esRaiz = false;
+    }
+
+    //si es raiz
+    if (esRaiz){
+        unsigned int ult = numeroUltimaVersionArchivo(a) + 1;    //obtenemos el numero de ultima version del archivo y le sumamos 1
+        int versionNum = atoi(version);
+        if (versionNum >= 1 && versionNum <= (int)ult){
+            crearVersionArchivo(a, version);
+            return OK;
+        }
+        else
+            return ERROR;
+    }
+    else {
+        if (existeVersionEnArchivo(a, version)){
+            crearVersionArchivo(a, version);
+            return OK;
+        }
+        else if (!existePadreEnArchivo(a, version) || !existeSubversionHermanaAnteriorEnArchivo(a, version))
+            return ERROR;
+        else {
+            crearVersionArchivo(a, version);
+            return OK;
+        }
+    }
+}*/
 
 
 //****************  DESTRUCTORAS ***********************

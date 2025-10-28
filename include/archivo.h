@@ -85,12 +85,9 @@ bool igualesVersionesArchivo (Archivo archivo, char* numeroVersion1, char* numer
 //Pos-Cond: Retorna true si la Version "numeroVersion" existe en el Archivo "archivo"
 bool existeVersionEnArchivo(Archivo archivo, char* numeroVersion);
 
-//pos-cond: devuelve true si la subversion hermana anterior a la subversion numeroVersion existe
-bool existeSubversionHermanaAnteriorEnArchivo(Archivo archivo, char* numeroVersion);
-
-//pos-cond: devuelve true si la version padre a la version numeroVersion existe
-bool existePadreEnArchivo(Archivo archivo, char* numeroVersion);
-
+//pre-cond: no tiene
+//pos-cond: devuelve TRUE si la version numeroVersion puede insertarse en el archivo
+bool puedeInsertarVersionEnArchivo(Archivo archivo, char* numeroVersion);
 
 
 //****************  DESTRUCTORAS ***********************
