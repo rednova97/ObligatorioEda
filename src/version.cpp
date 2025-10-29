@@ -698,13 +698,16 @@ void eliminarSubVersion(AV &nodoVer, AV subVersion){
         //si estamos en el nodo que queremos borrar
         if (nodoVer == subVersion){
             AV sig = nodoVer->sH;
+            nodoVer->sH = NULL;         //desenganchamos los hermanos para no borrarlos
             eliminarAV(nodoVer);
             nodoVer = sig;              //reenganchamos con el siguiente hermano
         }
         //sino
         else {
             eliminarSubVersion(nodoVer->pH, subVersion);
-            eliminarSubVersion(nodoVer->sH, subVersion);
+
+            if (nodoVer != NULL)
+                eliminarSubVersion(nodoVer->sH, subVersion);
         }
     }
 }
