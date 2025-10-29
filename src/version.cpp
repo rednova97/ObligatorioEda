@@ -513,11 +513,21 @@ bool existeVersion (Version version, char* numeroVersion){
     while (aux != NULL && aux->versionRaiz->numeroVersion[0] != aBuscar){
         aux = aux->sig;
     }
-    AV esta = buscar(aux->versionRaiz, numVer, tope);
-    if (esta != NULL)
-        return true;
-    else
+
+    if (aux == NULL){
+        delete[] numVer;
         return false;
+    }
+
+    AV esta = buscar(aux->versionRaiz, numVer, tope);
+    if (esta != NULL){
+        delete[] numVer;
+        return true;
+    }
+    else {
+        delete[] numVer;
+        return false;
+    }
 }
 
 //pre-cond: a y b tienen el mismo tamanio
