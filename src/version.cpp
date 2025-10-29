@@ -687,6 +687,25 @@ bool puedeInsertarVersion(Version version, char* numeroVersion){
     }
 }
 
+//pos-cond: devuelve TRUE si se puede insertar una linea. Solo se puede insertar una linea de una version si la version existe, si esta no tiene hijas y si numLinea <= cantLineas + 1
+bool puedeInsertarLinea(Version version, char* numeroVersion, unsigned int numLinea){
+    if (!existeVersion(version, numeroVersion))
+        return false;
+
+    AV ver = obtenerVersion(version, numeroVersion);
+    if (ver == NULL)
+        return false;
+
+    if (numLinea > numeroUltimaLineaVersion(ver, numeroVersion) + 1)
+        return false;
+
+    if (tieneHijas(version, numeroVersion))
+        return false;
+
+    return true;
+}
+
+
 //pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si la version existe, si esta no tiene hijas y si la linea existe 
 bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLinea){
     if (!existeVersion(version, numeroVersion))
@@ -698,10 +717,16 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
     
     if (!existeNumeroLinea(ver->linea, numLinea))
         return false;
+    
     if (tieneHijas(version, numeroVersion))
         return false;
     
     return true;
+}
+
+
+bool hubieronCambios(Version version, char* numeroVersion){
+
 }
 
 

@@ -89,6 +89,9 @@ bool existeVersionEnArchivo(Archivo archivo, char* numeroVersion);
 //pos-cond: devuelve TRUE si la version numeroVersion puede insertarse en el archivo
 bool puedeInsertarVersionEnArchivo(Archivo archivo, char* numeroVersion);
 
+//pos-cond: devuelve TRUE si se puede insertar una linea. Solo se puede insertar una linea de una version si la version existe, si esta no tiene hijas y si numLinea <= cantLineas + 1
+bool puedeInsertarLineaEnVersion(Archivo archivo, char* numeroVersion, unsigned int numLinea);
+
 //pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si esta NO TIENE SUBVERSIONES
 bool puedeBorrarLineaEnVersion(Archivo archivo, char* numeroVersion, unsigned int numLinea);
 

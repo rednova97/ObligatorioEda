@@ -267,18 +267,15 @@ TipoRet mostrarVersiones(Archivo a){
     return OK;
 }
 
-TipoRet insertarLinea(Archivo &a, char * version, char * linea, unsigned int nroLinea){ 
-    if (!existeVersionEnArchivo(a, version))
-        return ERROR;
-    else {
-        unsigned int x = numeroUltimaLinea(a, version);
-        if (nroLinea < 1 || (nroLinea > x + 1 ))
-            return ERROR;
-        else 
-            insertarLineaVersionDeArchivo(a, version, linea, nroLinea);
+TipoRet insertarLinea(Archivo &a, char * version, char * linea, unsigned int nroLinea){
+    if (puedeInsertarLineaEnVersion(a, version, nroLinea)){
+        insertarLineaVersionDeArchivo(a, version, linea, nroLinea);
+        return OK;
     }
-    return OK;
+    else
+        return ERROR;
 }
+
 
 TipoRet borrarLinea(Archivo &a, char * version, unsigned int nroLinea){
     if (puedeBorrarLineaEnVersion(a, version, nroLinea)){
@@ -308,3 +305,19 @@ TipoRet iguales(Archivo a, char * version1, char * version2, bool &iguales){
 TipoRet versionIndependiente(Archivo &a, char * version){
     return NO_IMPLEMENTADA;
 }
+
+
+
+
+/*TipoRet insertarLinea(Archivo &a, char * version, char * linea, unsigned int nroLinea){ 
+    if (!existeVersionEnArchivo(a, version))
+        return ERROR;
+    else {
+        unsigned int x = numeroUltimaLinea(a, version);
+        if (nroLinea < 1 || (nroLinea > x + 1 ))
+            return ERROR;
+        else 
+            insertarLineaVersionDeArchivo(a, version, linea, nroLinea);
+    }
+    return OK;
+}*/
