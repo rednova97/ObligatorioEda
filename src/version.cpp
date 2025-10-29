@@ -654,37 +654,6 @@ bool puedeInsertarVersion(Version version, char* numeroVersion){
 }
 
 
-/*TipoRet crearVersion(Archivo &a, char * version){
-    bool esRaiz = true;
-    for (int i = 0; version[i] != '\0' && esRaiz; i++){
-        if (version[i] == '.')
-            esRaiz = false;
-    }
-
-    //si es raiz
-    if (esRaiz){
-        unsigned int ult = numeroUltimaVersionArchivo(a) + 1;    //obtenemos el numero de ultima version del archivo y le sumamos 1
-        int versionNum = atoi(version);
-        if (versionNum >= 1 && versionNum <= (int)ult){
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-        else
-            return ERROR;
-    }
-    else {
-        if (existeVersionEnArchivo(a, version)){
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-        else if (!existePadreEnArchivo(a, version) || !existeSubversionHermanaAnteriorEnArchivo(a, version))
-            return ERROR;
-        else {
-            crearVersionArchivo(a, version);
-            return OK;
-        }
-    }
-}*/
 
 
 //****************  DESTRUCTORAS ***********************
@@ -699,9 +668,15 @@ void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int n
 //Pos-cond: elimina los hijos de un arbol
 void eliminarSoloHijos(AV &t){
     if (t != NULL){
-        eliminarSoloHijos(t->pH);
-        delete t;
-        t = NULL;
+        AV hijo = t->pH;
+        AV sig;
+
+        while (hijo != NULL){
+            sig = hijo->sH;         //guardamos el siguiente hermano de "hijo"
+            eliminarAV(hijo);
+            hijo = sig;
+        }
+        t->pH = NULL;
     }
 }
 
@@ -722,30 +697,14 @@ void eliminarSubVersion(AV &nodoVer, AV subVersion){
     if (nodoVer != NULL && subVersion != NULL){
         //si estamos en el nodo que queremos borrar
         if (nodoVer == subVersion){
-            eliminarSoloHijos(nodoVer);
-            nodoVer = NULL;
+            AV sig = nodoVer->sH;
+            eliminarAV(nodoVer);
+            nodoVer = sig;              //reenganchamos con el siguiente hermano
         }
         //sino
         else {
-            //si lo que queremos borrar esta como primer hijo
-            if (nodoVer->pH == subVersion){
-                AV temp = subVersion->sH;
-                eliminarSoloHijos(nodoVer->pH);
-                nodoVer->pH = temp;
-            }
-            //sino
-            else
-                eliminarSubVersion(nodoVer->pH, subVersion);
-
-            //si lo que queremos borrar esta como siguiente hermano
-            if (nodoVer->sH == subVersion){
-                AV temp = subVersion->sH;
-                eliminarSoloHijos(nodoVer->sH);
-                nodoVer->sH = temp;
-            }
-            //sino
-            else
-                eliminarSubVersion(nodoVer->sH, subVersion);
+            eliminarSubVersion(nodoVer->pH, subVersion);
+            eliminarSubVersion(nodoVer->sH, subVersion);
         }
     }
 }
@@ -760,59 +719,55 @@ void destruirVersion (Version &version, char* numeroVersion){
     int aEliminar = numVer[0];            //obtenemos el primer numero de numVer, el cual usaremos para buscar en la lista de versiones
     Version aux = version;
 
-    while ((aux != NULL) & (aux->versionRaiz->numeroVersion[0] != aEliminar))
+    while ((aux != NULL) && (aux->versionRaiz->numeroVersion[0] != aEliminar))
         aux = aux->sig;
     
     //si tope = 0 queremos borrar una version raiz padre, y por lo tanto, todas sus subversiones
     if (tope == 0){
-        //si queremos eliminar la version padre 1
-        if (aEliminar == 1){
-            version = version->sig;
-            eliminarAV(aux->versionRaiz);
-            delete aux;
-            aux->sig = version;
-            while (aux != NULL){
-                renumeracionDescendente(version->versionRaiz, 0);
-                aux = aux->sig;
-            }
-        }
-        //sino
-        else {
-            //si lo que queremos borrar esta en el "medio"
-            if (aux->sig != NULL){
-                Version iter = version;
-                while (iter->sig != aux)
-                    iter = iter->sig;
-                eliminarAV(aux->versionRaiz);
-                iter->sig = aux->sig;
-                delete aux;
-                aux = iter->sig;
-                while(aux != NULL){
-                    renumeracionDescendente(aux->versionRaiz, 0);
-                    aux = aux->sig;
-                }
-            }
-            //sino, esta al final
-            if (aux == NULL){
-                Version iter = version;
-                while (iter->sig->sig != NULL)
-                    iter = iter->sig;
-                aux = iter->sig;
-                eliminarAV(aux->versionRaiz);
-                iter->sig = NULL;
-                delete aux;
-            }
+        Version iter = version;
+        Version anterior = NULL;
+
+        while (iter != NULL && iter->versionRaiz->numeroVersion[0] != aEliminar){
+            anterior = iter;
+            iter = iter->sig;
         }
 
+        if (iter != NULL){
+            if (anterior == NULL)
+                version = iter->sig;
+            else
+                anterior->sig = iter->sig;
+
+            eliminarAV(iter->versionRaiz);
+            delete iter;
+
+            Version temp;
+            if (anterior == NULL)
+                temp = version;
+            else
+                temp = anterior->sig;
+
+            while (temp != NULL){
+                renumeracionDescendente(temp->versionRaiz, 0);
+                temp = temp->sig;
+            }
+        }
     }
     //sino, vamos a eliminar una subversion
     else {
-        //buscamos la subversion a eliminar
         AV aBorrar = buscar(aux->versionRaiz, numVer, tope);
-        eliminarSubVersion(aux->versionRaiz, aBorrar);
-        if (aBorrar->sH != NULL)
-            renumeracionDescendente(aBorrar->sH, aBorrar->tope);
+        
+        if (aBorrar != NULL){
+            AV hermana = aBorrar->sH;
+            int nivel = aBorrar->tope;
+
+            eliminarSubVersion(aux->versionRaiz, aBorrar);
+
+            if (hermana != NULL)
+                renumeracionDescendente(hermana, nivel);
+        }
     }
+
     delete[] numVer;
 }
 
@@ -820,10 +775,10 @@ void destruirVersion (Version &version, char* numeroVersion){
 //Pre-Cond: No tiene
 //Pos-Cond: Elimina toda la memoria reservada por "version"
 void destruirTodasLasVersiones(Version &version){  
-    if (version != NULL) {
+    while (version != NULL){
+        Version sig = version->sig;
         eliminarAV(version->versionRaiz);
-        destruirTodasLasVersiones(version->sig);
         delete version;
-        version = NULL;
+        version = sig;                      //avanzamos en la lista de versiones
     }
 }
