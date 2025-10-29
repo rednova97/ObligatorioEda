@@ -149,7 +149,34 @@ Linea copiarLineas(Linea linea){
 
 //pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
 void mostrarDiferenciasLineas(Linea padre, Linea hija){
-    
+    bool huboCambios = false;
+
+    while (padre != NULL || hija != NULL){
+        if (padre == NULL && hija != NULL){
+            printf("IL\t%d\t", hija->numLinea);
+            printf("%s\n", hija->texto);
+            hija = hija->sig;
+            huboCambios = true;
+        }
+        else if (hija == NULL && padre != NULL){
+            printf("BL\t%d\n", padre->numLinea);
+            padre = padre->sig;
+            huboCambios = true;
+        }
+        else {
+            if (!sonIgualesLineas(hija, padre)){
+                printf("BL\t%d\n", padre->numLinea);
+                printf("IL\t%d\t", hija->numLinea);
+                printf("%s\n", hija->texto);
+                huboCambios = true;
+            }
+            hija = hija->sig;
+            padre = padre->sig;
+        }
+    }
+
+    if (!huboCambios)
+        printf("No se realizaron modificaciones\n");
 }
 
 

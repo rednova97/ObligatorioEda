@@ -85,6 +85,7 @@ char* convertirCadenaArregloChar(Cadena cadena){
     return arreglo;
 }
 
+
 //Pos-Cond: libera toda la memoria de cadena
 void destruirCadena (Cadena &cadena){
     while (cadena != NULL){
