@@ -281,7 +281,12 @@ TipoRet insertarLinea(Archivo &a, char * version, char * linea, unsigned int nro
 }
 
 TipoRet borrarLinea(Archivo &a, char * version, unsigned int nroLinea){
-    return NO_IMPLEMENTADA;
+    if (puedeBorrarLineaEnVersion(a, version, nroLinea)){
+        borrarLineaVersionArchivo(a, version, nroLinea);
+        return OK;
+    }
+    else
+        return ERROR;
 }
 
 TipoRet mostrarTexto(Archivo a, char * version){

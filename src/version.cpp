@@ -66,6 +66,10 @@ bool tieneHermanaAnterior(Version version, char* numeroVersion);
 //pos-cond: devuelve true si existe la version padre de la subversion numeroVersion
 bool tienePadre(Version version, char* numeroVersion);
 
+//pre-cond: existeVersion(numeroVersion) = TRUE
+//pos-cond: devuelve TRUE si la version numeroVersion tiene subversiones
+bool tieneHijas(Version version, char* numeroVersion);
+
 //Pos-cond: elimina los hijos de un arbol
 void eliminarSoloHijos(AV &t);
 
@@ -604,6 +608,30 @@ bool tienePadre(Version version, char* numeroVersion){
     return existe;
 }
 
+//pre-cond: existeVersion(numeroVersion) = TRUE
+//pos-cond: devuelve TRUE si la version numeroVersion tiene subversiones
+bool tieneHijas(Version version, char* numeroVersion){
+    int *numVer = NULL;
+    int tope;
+    convertirStringEnArrInt(numeroVersion, numVer, tope);
+    int aBuscar = numVer[0];
+
+    Version aux = version;
+    while (aux != NULL && aux->versionRaiz->numeroVersion[0] != aBuscar)
+        aux = aux->sig;
+    
+    AV nodo = buscar(aux->versionRaiz, numVer, tope);
+
+    if (nodo->pH != NULL){
+        delete[] numVer;
+        return true;
+    }
+    else {
+        delete[] numVer;
+        return false;
+    }
+}
+
 //pre-cond: no tiene
 //pos-cond: devuelve TRUE si se puede insertar la version numeroVersion
 bool puedeInsertarVersion(Version version, char* numeroVersion){
@@ -649,7 +677,22 @@ bool puedeInsertarVersion(Version version, char* numeroVersion){
     }
 }
 
+//pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si la version existe, si esta no tiene hijas y si la linea existe 
+bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLinea){
+    if (!existeVersion(version, numeroVersion))
+        return false;
 
+    AV ver = obtenerVersion(version, numeroVersion);
+    if (ver == NULL)
+        return false;
+    
+    if (!existeNumeroLinea(ver->linea, numLinea))
+        return false;
+    if (tieneHijas(version, numeroVersion))
+        return false;
+    
+    return true;
+}
 
 
 //****************  DESTRUCTORAS ***********************

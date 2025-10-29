@@ -133,6 +133,11 @@ bool puedeInsertarVersionEnArchivo(Archivo archivo, char* numeroVersion){
     return puedeInsertarVersion(archivo->version, numeroVersion);
 }
 
+//pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si esta NO TIENE SUBVERSIONES
+bool puedeBorrarLineaEnVersion(Archivo archivo, char* numeroVersion, unsigned int numLinea){
+    return puedeBorrarLinea(archivo->version, numeroVersion, numLinea);
+}
+
 //****************  DESTRUCTORAS ***********************
 
 //Pre-Cond: No tiene

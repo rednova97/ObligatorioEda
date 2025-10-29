@@ -81,6 +81,9 @@ bool existeVersion (Version version, char* numeroVersion);
 //pos-cond: devuelve TRUE si se puede insertar la version numeroVersion
 bool puedeInsertarVersion(Version version, char* numeroVersion);
 
+//pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si esta NO TIENE SUBVERSIONES
+bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLinea);
+
 
 
 //****************  DESTRUCTORAS ***********************
