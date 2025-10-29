@@ -147,6 +147,12 @@ Linea copiarLineas(Linea linea){
     return inicio;
 }
 
+//pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
+void mostrarDiferenciasLineas(Linea padre, Linea hija){
+    
+}
+
+
 //*************************** PREDICADOS ********************** */
 
 //Pos-Cond: retorna true si linea es vaci­a
@@ -168,6 +174,9 @@ bool existeNumeroLinea(Linea linea, unsigned int numLinea){
 //Pos-Cond: retorna true si fila1 tiene los mismos caracteres 
 //          y en el mismo orden que fila2
 bool sonIgualesLineas(Linea linea1, Linea linea2){
+    if (linea1 == NULL || linea2 == NULL)
+        return false; 
+    
     return sonIgualesCadenas(linea1->texto, linea2->texto);
 }
 

@@ -49,6 +49,9 @@ char* obtenerTextoLinea (Linea linea, unsigned int numLinea);
 //pos-cond: devuelve una copia de la linea "linea" sin compartir memoria
 Linea copiarLineas(Linea linea);
 
+//pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
+void mostrarDiferenciasLineas(Linea padre, Linea hija);
+
 //*************************** PREDICADOS ********************** */
 
 //Pos-Cond: retorna true si linea es vacía
