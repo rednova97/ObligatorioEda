@@ -284,6 +284,7 @@ void crearVersion (Version &version, char *num_version){
 
         //si el padre existe (por la precondicion, si vamos a insertar una subversion el padre debe existir)
         if (padre != NULL){
+            nuevaSubVer->linea = copiarLineas(padre->linea);
             AV actual = padre->pH;
             AV anterior = NULL;
 
@@ -311,8 +312,6 @@ void crearVersion (Version &version, char *num_version){
                     anterior->sH = nuevaSubVer;
                 nuevaSubVer->sH = actual;
             }
-
-            nuevaSubVer->linea = copiarLineas(padre->linea);
         }
 
     }
@@ -348,21 +347,18 @@ AV obtenerVersion(Version &version, char *numVersion){
     int tope;
     convertirStringEnArrInt(numVersion, arrInt, tope);
 
-    //si la version buscada es la version padre
-    if (tope == 1){
-        Version aux = version;
-        while (aux != NULL){
-            if (aux->versionRaiz->numeroVersion[0] == arrInt[0])
-                return aux->versionRaiz;
-            aux = aux->sig;
-        }
+    Version aux = version;
+    while (aux != NULL && aux->versionRaiz->numeroVersion[0] != arrInt[0])
+        aux = aux->sig;
+
+    if (aux == NULL)
         return NULL;
-        
-    }
-    //sino, es una subversion
-    else {
-        return buscar(version->versionRaiz, arrInt, tope);
-    }
+    
+    if (tope == 0)
+        return aux->versionRaiz;
+    
+    AV res = buscar(aux->versionRaiz, arrInt, tope);
+    return res;
 }
 
 

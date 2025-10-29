@@ -117,19 +117,34 @@ char* obtenerTextoLinea (Linea linea, unsigned int numLinea){
 
 //pos-cond: devuelve una copia de todas las lineas sin compartir memoria
 Linea copiarLineas(Linea linea){
-    Linea copia = crearLineaVacia();
+    if (linea == NULL)
+        return NULL;
+    
+    Linea inicio = NULL;
+    Linea actual = NULL;
     Linea aux = linea;
-    unsigned int pos = 1;
 
-    while (aux != NULL) {
+    while (aux != NULL){
+        Linea nueva = new _rep_linea;
+        nueva->texto = NULL;
         char* texto = convertirCadenaArregloChar(aux->texto);
-        insertarLinea(copia, texto, pos);
-        delete[] texto; 
+        agregarCaracteresCadena(nueva->texto, texto);
+
+        delete[] texto;
+
+        nueva->numLinea = aux->numLinea;
+        nueva->sig = NULL;
+
+        if (inicio == NULL)
+            inicio = nueva;
+        else
+            actual->sig = nueva;
+        
+        actual = nueva;
         aux = aux->sig;
-        pos++;
     }
 
-    return copia;
+    return inicio;
 }
 
 //*************************** PREDICADOS ********************** */

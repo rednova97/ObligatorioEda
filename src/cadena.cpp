@@ -70,13 +70,18 @@ char* convertirCadenaArregloChar(Cadena cadena){
         largo++;
         aux = aux->sig;
     }
-    largo++;
-    char* arreglo = new char[largo];
-    for (int i = 0; i < largo - 1; i++){
-        arreglo[i] = cadena->car;
-        cadena = cadena->sig;
+
+    char* arreglo = new char[largo + 1];
+    aux = cadena;
+
+    int i = 0;
+    while (aux != NULL){
+        arreglo[i] = aux->car;
+        aux = aux->sig;
+        i++;
     }
-    arreglo[largo-1] = '\0';
+    
+    arreglo[i] = '\0';
     return arreglo;
 }
 
