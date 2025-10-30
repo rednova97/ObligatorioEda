@@ -68,6 +68,9 @@ int numeroUltimaVersion(Version version);
 //Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
 int numeroUltimaLineaVersion(AV ver, char *numeroVersion);
 
+//pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
+void mostrarCambiosVersion(Version version, char* numeroVersion);
+
 //********************* PREDICADOS ************************* */
 //pre-cond:No tiene
 //pos-cond:Retorna true si la Version "version" es vacia.

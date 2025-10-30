@@ -76,6 +76,8 @@ void eliminarSoloHijos(AV &t);
 //pos-cond: elimina un arbol completamente
 void eliminarAV(AV &t);
 
+char* convertirArrIntEnString(int *arrInt, int tope);
+
 //***************** FIN FUNCIONES AUXILIARES****** */
 
 
@@ -493,6 +495,54 @@ int numeroUltimaLineaVersion(AV ver, char *numeroVersion){
         return cantidadLineas(ver->linea);
     else
         return 0;
+}
+
+char* convertirArrIntEnString(int *arrInt, int tope){
+    if (tope < 0)
+        return NULL;
+    
+    int maxTam = tope*4;
+    char* resultado = new char[maxTam];
+    resultado[0] = '\0';
+
+    char buffer[10];
+
+    for (int i = 0; i < tope; i++){
+        sprintf(buffer, "%d", arrInt[i]);
+        strcat(resultado, buffer);
+        if (i < tope - 1)
+            strcat(resultado, ".");
+    }
+    return resultado;
+}
+
+//pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
+void mostrarCambiosVersion(Version version, char* numeroVersion){
+    int *numVer = NULL;
+    int tope;
+    convertirStringEnArrInt(numeroVersion, numVer, tope);
+
+    AV hija = obtenerVersion(version, numeroVersion);
+
+    AV padre = NULL;
+    if (tope > 0){
+        int *padreVer = new int[tope];
+        copiarArreglo(numVer, padreVer, tope - 1);
+        char* padreStr = convertirArrIntEnString(padreVer, tope - 1);
+        padre = obtenerVersion(version, padreStr);
+
+        delete[] padreVer;
+        delete[] padreStr;
+    }
+
+    printf("\n %s\n\n", numeroVersion);
+
+    if (padre != NULL)
+        mostrarDiferenciasLineas(padre->linea, hija->linea);
+    else
+        mostrarDiferenciasLineas(NULL, hija->linea);
+
+    delete[] numVer;
 }
 
 //********************* PREDICADOS ************************* */
