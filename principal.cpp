@@ -295,7 +295,11 @@ TipoRet mostrarTexto(Archivo a, char * version){
 }
 
 TipoRet mostrarCambios(Archivo a, char * version){
-    return NO_IMPLEMENTADA;
+    if (!existeVersionEnArchivo(a, version))
+        return ERROR;
+    
+    mostrarCambiosArchivo(a, version);
+    return OK;
 }
 
 TipoRet iguales(Archivo a, char * version1, char * version2, bool &iguales){

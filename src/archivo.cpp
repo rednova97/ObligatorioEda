@@ -80,7 +80,9 @@ void insertarLineaVersionDeArchivo (Archivo &archivo, char* numeroVersion, char 
 
 //Pre-Cond: Tiene version padre.
 //Pos-Cond: Imprime los cambios realizados en la version numeroVersion con respecto al padre.
-void mostrarCambiosArchivo (Archivo archivo, char* numeroVersion);
+void mostrarCambiosArchivo (Archivo archivo, char* numeroVersion){
+    mostrarCambiosVersion(archivo->version, numeroVersion);
+}
 
 
 //Pre-Cond: La Version "numeroVersion" existe en el Archivo "archivo".
