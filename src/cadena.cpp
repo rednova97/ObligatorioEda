@@ -25,7 +25,7 @@ Cadena crearCadenaVacia(){
 //Pre-Cond: esVaciaCadenaCaracteres(cadena)retorna true.
 //Pos-Cond: agrega los caracteres de cadena a la fila vaica "fila"
 void agregarCaracteresCadena(Cadena &cadena, char* texto){
-    Cadena p;
+    Cadena p = cadena;
     int i = 0;
     
     while (texto[i] != '\0'){

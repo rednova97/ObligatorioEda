@@ -71,6 +71,7 @@ void insertarLinea(Linea &linea, char* texto, unsigned int numLinea) {
             aux = aux->sig;
         }
     }
+    renumerarLineas(linea);
 }
 
 
@@ -149,34 +150,116 @@ Linea copiarLineas(Linea linea){
 
 //pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
 void mostrarDiferenciasLineas(Linea padre, Linea hija){
-    bool huboCambios = false;
+    //Contamos el tamanio del padre y de la hija
+    unsigned int tamanioPadre = 0;
+    unsigned int tamanioHija = 0;
 
-    while (padre != NULL || hija != NULL){
-        if (padre == NULL && hija != NULL){
-            printf("IL\t%d\t", hija->numLinea);
-            printf("%s\n", hija->texto);
-            hija = hija->sig;
-            huboCambios = true;
-        }
-        else if (hija == NULL && padre != NULL){
-            printf("BL\t%d\n", padre->numLinea);
-            padre = padre->sig;
-            huboCambios = true;
-        }
-        else {
-            if (!sonIgualesLineas(hija, padre)){
-                printf("BL\t%d\n", padre->numLinea);
-                printf("IL\t%d\t", hija->numLinea);
-                printf("%s\n", hija->texto);
-                huboCambios = true;
+    Linea iterPadre = padre;
+    while (iterPadre != NULL){
+        tamanioPadre++;
+        iterPadre = iterPadre->sig;
+    }
+
+    Linea iterHija = hija;
+    while (iterHija != NULL){
+        tamanioHija++;
+        iterHija = iterHija->sig;
+    }
+
+    // Copiamos los punteros en arreglos para hacer la busqueda mas "facil"
+    Linea *arrPadre = NULL;
+    if (tamanioPadre > 0)
+        arrPadre = new Linea[tamanioPadre];
+    
+    Linea *arrHija  = NULL;
+    if (tamanioHija > 0)
+        arrHija = new Linea[tamanioHija];
+
+    unsigned int i = 0;
+
+    iterPadre = padre;
+    while (iterPadre != NULL){
+        arrPadre[i] = iterPadre;
+        i++;
+        iterPadre = iterPadre->sig;
+    }
+
+    i = 0;
+
+    iterHija = hija;
+    while (iterHija != NULL){
+        arrHija[i] = iterHija;
+        i++;
+        iterHija = iterHija->sig;
+    }
+    
+
+    //creamos arreglos booleanos para marcar las coincidencias
+    bool *coincidePadre = NULL;
+    if (tamanioPadre > 0)
+        coincidePadre = new bool[tamanioPadre];
+    
+    bool *coincideHija  = NULL;
+    if (tamanioHija > 0)
+        coincideHija = new bool[tamanioHija];
+    
+    for (i = 0; i < tamanioPadre; i++){
+        if (coincidePadre)
+            coincidePadre[i] = false;
+    }
+    for (i = 0; i < tamanioHija;  i++){
+        if (coincideHija)
+            coincideHija[i] = false;
+    }
+
+    //cada hija busca su primera coincidencia con el padre
+    for (unsigned int ih = 0; ih < tamanioHija; ih++){
+        for (unsigned int ip = 0; ip < tamanioPadre; ip++){
+            bool hijaYaCoincide = (coincideHija && coincideHija[ih]);
+            if (!hijaYaCoincide){
+                bool padreNoCoincidente = !(coincidePadre && coincidePadre[ip]);
+                if (padreNoCoincidente){
+                    if (sonIgualesCadenas(arrHija[ih]->texto, arrPadre[ip]->texto)){
+                        if (coincideHija)
+                            coincideHija[ih] = true;
+                        if (coincidePadre)
+                            coincidePadre[ip] = true;
+                    }
+                }
             }
-            hija = hija->sig;
-            padre = padre->sig;
+        }
+    }
+
+    bool huboCambios = false;       //hija con respecto al padre
+
+    // hacemos las inserciones IL en orden de la hija
+    for (unsigned int ih = 0; ih < tamanioHija; ih++){
+        if (!(coincideHija && coincideHija[ih])){
+            printf("IL\t%d\t", arrHija[ih]->numLinea);
+            printf("%s\n", convertirCadenaArregloChar(arrHija[ih]->texto));
+            huboCambios = true;
+        }
+    }
+
+    //hacemos los borrados BL en orden del padre
+    for (unsigned int ip = 0; ip < tamanioPadre; ip++){
+        if (!(coincidePadre && coincidePadre[ip])){
+            printf("BL\t%d\n", arrPadre[ip]->numLinea);
+            huboCambios = true;
         }
     }
 
     if (!huboCambios)
         printf("No se realizaron modificaciones\n");
+
+    if (arrPadre) 
+        delete[] arrPadre;
+    if (arrHija) 
+        delete[] arrHija;
+    if (coincidePadre) 
+        delete[] coincidePadre;
+    if (coincideHija) 
+        delete[] coincideHija;
 }
 
 
@@ -213,49 +296,32 @@ bool sonIgualesLineas(Linea linea1, Linea linea2){
 //Pre-cond: la Linea "numLinea" existe en la Linea "linea"
 //Pos-Cond: elimina la Linea de la estructura "linea" de la posicion "numLinea" y reenumera las siguientes lineas (si hay)
 void eliminarLinea(Linea &linea, unsigned int numLinea){
-    Linea aux = linea;
-    while (aux != NULL && aux->numLinea != numLinea)
-        aux = aux->sig;
-    
-    destruirCadena(aux->texto);     //liberamos la memoria ocupada por la cadena
-    
-    if (aux == linea && aux->ant == NULL){
-        //Si queremos borrar la primer linea
-        if (linea->sig == NULL){    //solo hay una linea
-            delete aux;
-            linea = NULL;
-        }    
-        else {                      //hay mas de una linea
-            linea = aux->sig;
-            aux->sig->ant = NULL;
-            Linea rec = aux->sig;
-            delete aux;
-            
-            while (rec != NULL){
-                rec->numLinea--;
-                rec = rec->sig;
-            }  
+    Linea anterior = NULL;
+    Linea actual = linea;
+
+    while (actual != NULL && actual->numLinea != numLinea){
+        anterior = actual;
+        actual = actual->sig;
+    }
+        
+    if (anterior == NULL){
+        //borrar la primer linea
+        linea = actual->sig;
+        if (linea != NULL){
+            linea->ant = NULL;
         }
     }
     else {
-        if (aux->sig != NULL){
-            //si no estamos ni en la primera ni en la ultima linea
-            aux->ant->sig = aux->sig;
-            aux->sig->ant = aux->ant;
-            Linea rec = aux->sig;
-            delete aux;
+        anterior->sig = actual->sig;
+        if (actual->sig != NULL){
+            actual->sig->ant = anterior;
+        }
+    }
 
-            while (rec != NULL){
-                rec->numLinea--;
-                rec = rec->sig;
-            }
-        }
-        else {
-            //si llegamos aca es xq estamos en el ultimo nodo
-            aux->ant->sig = NULL;
-            delete aux;
-        }
-    }       
+    destruirCadena(actual->texto);
+    delete actual;
+
+    renumerarLineas(linea);
 }
 
 //Pos-Cond: elimina toda la memoria de la estructura Linea "linea"
@@ -265,5 +331,14 @@ void destruirLinea(Linea &linea){
         destruirCadena(aux->texto);     //liberamos la memoria ocupada por el texto
         linea = linea->sig;
         delete aux;
+    }
+}
+
+// Renumera todas las líneas desde el principio, dejando secuencia 1,2,3...
+void renumerarLineas(Linea linea) {
+    unsigned int i = 1;
+    while (linea != NULL) {
+        linea->numLinea = i++;
+        linea = linea->sig;
     }
 }

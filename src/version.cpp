@@ -335,11 +335,11 @@ AV buscar(AV t, int *numeroVersion, int tope){
         return NULL;
     else {
         if (!sonIgualesArrInt(t->numeroVersion, numeroVersion, t->tope + 1, tope + 1)){
-            AV esta_SH = buscar(t->sH, numeroVersion, tope);
-            if (esta_SH != NULL)
-                return esta_SH;
+            AV esta_PH = buscar(t->pH, numeroVersion, tope);
+            if (esta_PH != NULL)
+                return esta_PH;
             else
-                return buscar(t->pH, numeroVersion, tope);
+                return buscar(t->sH, numeroVersion, tope);
         }
         else 
             return t;
@@ -357,13 +357,20 @@ AV obtenerVersion(Version &version, char *numVersion){
     while (aux != NULL && aux->versionRaiz->numeroVersion[0] != arrInt[0])
         aux = aux->sig;
 
-    if (aux == NULL)
+    if (aux == NULL){
+        delete[] arrInt;
         return NULL;
+    }
+        
     
-    if (tope == 0)
+    if (tope == 0){
+        delete[] arrInt;
         return aux->versionRaiz;
+    }
+        
     
     AV res = buscar(aux->versionRaiz, arrInt, tope);
+    delete[] arrInt;
     return res;
 }
 
@@ -389,7 +396,7 @@ void imprimirVersion(AV version, char* numeroVersion){
         for (int i=1; i<=cant; i++){
             char* renglon = obtenerTextoLinea(version->linea, i);
             printf("%d    %s\n", i, renglon);
-            delete [] renglon;
+            delete[] renglon;
         }
     }  
 }
@@ -498,19 +505,22 @@ int numeroUltimaLineaVersion(AV ver, char *numeroVersion){
 }
 
 char* convertirArrIntEnString(int *arrInt, int tope){
+    // 'tope' representa el índice del ÚLTIMO elemento (no la cantidad)
+    // Por ejemplo: para version 1.2.3, tope = 2 y elementos en arrInt[0..2]
     if (tope < 0)
         return NULL;
-    
-    int maxTam = tope*4;
+
+    int cantidad = tope + 1;
+    int maxTam = cantidad * 4 + 1;              
     char* resultado = new char[maxTam];
     resultado[0] = '\0';
 
-    char buffer[10];
+    char buffer[16];
 
-    for (int i = 0; i < tope; i++){
+    for (int i = 0; i <= tope; i++){
         sprintf(buffer, "%d", arrInt[i]);
         strcat(resultado, buffer);
-        if (i < tope - 1)
+        if (i < tope)
             strcat(resultado, ".");
     }
     return resultado;
@@ -534,8 +544,6 @@ void mostrarCambiosVersion(Version version, char* numeroVersion){
         delete[] padreVer;
         delete[] padreStr;
     }
-
-    printf("\n %s\n\n", numeroVersion);
 
     if (padre != NULL)
         mostrarDiferenciasLineas(padre->linea, hija->linea);
@@ -746,7 +754,7 @@ bool puedeInsertarLinea(Version version, char* numeroVersion, unsigned int numLi
     if (ver == NULL)
         return false;
 
-    if (numLinea > numeroUltimaLineaVersion(ver, numeroVersion) + 1)
+    if ((int)numLinea > numeroUltimaLineaVersion(ver, numeroVersion) + 1)
         return false;
 
     if (tieneHijas(version, numeroVersion))
@@ -764,20 +772,17 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
     AV ver = obtenerVersion(version, numeroVersion);
     if (ver == NULL)
         return false;
+
+    if (tieneHijas(version, numeroVersion))
+        return false;    
     
     if (!existeNumeroLinea(ver->linea, numLinea))
-        return false;
-    
-    if (tieneHijas(version, numeroVersion))
         return false;
     
     return true;
 }
 
 
-bool hubieronCambios(Version version, char* numeroVersion){
-
-}
 
 
 //****************  DESTRUCTORAS ***********************

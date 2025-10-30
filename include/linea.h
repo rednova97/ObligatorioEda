@@ -75,4 +75,7 @@ void eliminarLinea(Linea &linea, unsigned int numLinea);
 //Pos-Cond: elimina toda la memoria de la estructura Linea "linea"
 void destruirLinea(Linea &linea);
 
+// Renumera todas las líneas desde el principio, dejando secuencia 1,2,3...
+void renumerarLineas(Linea linea);
+
 #endif

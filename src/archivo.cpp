@@ -81,6 +81,8 @@ void insertarLineaVersionDeArchivo (Archivo &archivo, char* numeroVersion, char 
 //Pre-Cond: Tiene version padre.
 //Pos-Cond: Imprime los cambios realizados en la version numeroVersion con respecto al padre.
 void mostrarCambiosArchivo (Archivo archivo, char* numeroVersion){
+    // Encabezado con nombre de archivo y numero de version
+    printf("%s - %s\n", archivo->nombre, numeroVersion);
     mostrarCambiosVersion(archivo->version, numeroVersion);
 }
 
