@@ -132,7 +132,9 @@ unsigned int numeroUltimaVersionArchivo (Archivo archivo){
 //********************* PREDICADOS ************************* */
 
 //Pos-Cond: Retorna true si la Version "numeroVersion1" es igual a la version "numeroVersion2"
-bool igualesVersionesArchivo (Archivo archivo, char* numeroVersion1, char* numeroVersion2);
+bool igualesVersionesArchivo (Archivo archivo, char* numeroVersion1, char* numeroVersion2){
+    return sonIgualesVersiones(archivo->version, numeroVersion1, numeroVersion2);
+}
 
 
 //***********************************AGREGADA 11/09/2025 **********************

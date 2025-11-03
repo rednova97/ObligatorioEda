@@ -303,7 +303,16 @@ TipoRet mostrarCambios(Archivo a, char * version){
 }
 
 TipoRet iguales(Archivo a, char * version1, char * version2, bool &iguales){
-    return NO_IMPLEMENTADA;
+    if (!existeVersionEnArchivo(a, version1) || !existeVersionEnArchivo(a, version2))
+        return ERROR;
+    else{
+        iguales = igualesVersionesArchivo(a, version1, version2);
+        if (iguales)
+            printf("Las versiones %s y %s SON IGUALES\n", version1, version2);
+        else
+            printf("Las versiones %s y %s NO SON IGUALES\n", version1, version2);
+        return OK;
+    }
 }
 
 TipoRet versionIndependiente(Archivo &a, char * version){

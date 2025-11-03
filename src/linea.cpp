@@ -293,6 +293,17 @@ bool sonIgualesLineas(Linea linea1, Linea linea2){
     return sonIgualesCadenas(linea1->texto, linea2->texto);
 }
 
+//pos-cond: devuelve TRUE si la lista de lineas 1 es igual a la lista de linea 2
+bool sonIgualesTodasLasLineas(Linea linea1, Linea linea2){
+    while (linea1 != NULL && linea2 != NULL){
+        if (!sonIgualesCadenas(linea1->texto, linea2->texto))
+            return false;
+        linea1 = linea1->sig;
+        linea2 = linea2->sig;
+    }
+    return (linea1 == NULL && linea2 == NULL);
+}
+
 
 //***************************** DESTRUCTORAS **************** */
 

@@ -92,6 +92,10 @@ bool puedeInsertarLinea(Version version, char* numeroVersion, unsigned int numLi
 //pos-cond: devuelve TRUE si se puede eliminar una linea. Solo se puede eliminar una linea de una version si esta NO TIENE SUBVERSIONES
 bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLinea);
 
+//pre-cond: version1 y version2 existen
+//pos-cond: devuelve TRUE si version1 y version2 tienen exactamente el mismo texto
+bool sonIgualesVersiones(Version version, char* numeroVersion1, char* numeroVersion2);
+
 
 
 //****************  DESTRUCTORAS ***********************

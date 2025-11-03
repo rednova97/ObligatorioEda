@@ -866,7 +866,14 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
     return true;
 }
 
+//pre-cond: version1 y version2 existen
+//pos-cond: devuelve TRUE si version1 y version2 tienen exactamente el mismo texto
+bool sonIgualesVersiones(Version version, char* numeroVersion1, char* numeroVersion2){
+    AV v1 = obtenerNodoVersion(version, numeroVersion1);
+    AV v2 = obtenerNodoVersion(version, numeroVersion2);
 
+    return sonIgualesTodasLasLineas(v1->linea, v2->linea);
+}
 
 
 //****************  DESTRUCTORAS ***********************

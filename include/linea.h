@@ -65,6 +65,9 @@ bool existeNumeroLinea(Linea linea, unsigned int numLinea);
 //          y en el mismo orden que fila2
 bool sonIgualesLineas(Linea linea1, Linea linea2);
 
+//pos-cond: devuelve TRUE si la lista de lineas 1 es igual a la lista de linea 2
+bool sonIgualesTodasLasLineas(Linea linea1, Linea linea2);
+
 
 //***************************** DESTRUCTORAS **************** */
 
