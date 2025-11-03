@@ -608,54 +608,32 @@ char *obtenerNumeroPadre(char* numHija){
 
 //pre-cond: la version numeroVersion existe
 //pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
-void mostrarCambiosVersion(Version version, char *numeroVersion){
-    char* numPadre = obtenerNumeroPadre(numeroVersion);
-    int* arrNumPadre = NULL;
-    int topePadre;
-    convertirStringEnArrInt(numPadre, arrNumPadre, topePadre);
+void mostrarCambiosVersion(Version version, char* numeroVersion){
+    int *numVer = NULL;
+    int tope;
+    convertirStringEnArrInt(numeroVersion, numVer, tope);
 
-    //caso numeroVersion es la raiz
-    if (topePadre == 0){
-        int* numHija = NULL;
-        int topeHija;
-        convertirStringEnArrInt(numeroVersion, numHija, topeHija);
+    AV hija = obtenerNodoVersion(version, numeroVersion);
 
-        Version aux = version;
-        while (aux != NULL && aux->versionRaiz->numeroVersion[0] != numHija[0])
-            aux = aux->sig;
+    AV padre = NULL;
+    if (tope > 0){
+        int *padreVer = new int[tope];
+        copiarArreglo(numVer, padreVer, tope - 1);
+        char* padreStr = convertirArrIntEnString(padreVer, tope - 1);
+        padre = obtenerNodoVersion(version, padreStr);
 
-        AV hija = buscar(aux->versionRaiz, numHija, topeHija);
+        delete[] padreVer;
+        delete[] padreStr;
+    }
+
+    if (padre != NULL)
+        mostrarCambiosLineas(padre->linea, hija->linea);
+    else
         mostrarCambiosLineas(NULL, hija->linea);
 
-        delete[] numHija;
-    }
-    else {
-        Version aux = version;
-        while (aux != NULL && !sonIgualesArrInt(aux->versionRaiz->numeroVersion, arrNumPadre, aux->versionRaiz->tope + 1, topePadre + 1))
-            aux = aux->sig;
-
-        
-        
-        AV padre = buscar(aux->versionRaiz, arrNumPadre, topePadre);
-
-        int* numHija = NULL;
-        int topeHija;
-        convertirStringEnArrInt(numeroVersion, numHija, topeHija);
-        AV hija = buscar(aux->versionRaiz, numHija, topeHija);
-
-        if (padre != NULL)
-            mostrarCambiosLineas(padre->linea, hija->linea);
-        else
-            mostrarCambiosLineas(NULL, hija->linea);
-
-        delete[] numHija;
-        
-    }
-
-    delete[] numPadre;
-    delete[] arrNumPadre;
-
+    delete[] numVer;
 }
+
 
 
 
