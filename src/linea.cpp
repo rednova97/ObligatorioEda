@@ -127,7 +127,7 @@ Linea copiarLineas(Linea linea){
 
     while (aux != NULL){
         Linea nueva = new _rep_linea;
-        nueva->texto = NULL;
+        nueva->texto = crearCadenaVacia();  // Asegurar que se crea una cadena vacía
         char* texto = convertirCadenaArregloChar(aux->texto);
         agregarCaracteresCadena(nueva->texto, texto);
 
@@ -135,13 +135,19 @@ Linea copiarLineas(Linea linea){
 
         nueva->numLinea = aux->numLinea;
         nueva->sig = NULL;
-
-        if (inicio == NULL)
-            inicio = nueva;
-        else
-            actual->sig = nueva;
         
-        actual = nueva;
+        if (inicio == NULL) {
+            // Primera línea
+            inicio = nueva;
+            nueva->ant = NULL;
+            actual = nueva;
+        } else {
+            // Líneas siguientes
+            actual->sig = nueva;
+            nueva->ant = actual;
+            actual = nueva;
+        }
+        
         aux = aux->sig;
     }
 
@@ -149,118 +155,84 @@ Linea copiarLineas(Linea linea){
 }
 
 //pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
-void mostrarDiferenciasLineas(Linea padre, Linea hija){
-    //Contamos el tamanio del padre y de la hija
-    unsigned int tamanioPadre = 0;
-    unsigned int tamanioHija = 0;
-
-    Linea iterPadre = padre;
-    while (iterPadre != NULL){
-        tamanioPadre++;
-        iterPadre = iterPadre->sig;
-    }
-
-    Linea iterHija = hija;
-    while (iterHija != NULL){
-        tamanioHija++;
-        iterHija = iterHija->sig;
-    }
-
-    // Copiamos los punteros en arreglos para hacer la busqueda mas "facil"
-    Linea *arrPadre = NULL;
-    if (tamanioPadre > 0)
-        arrPadre = new Linea[tamanioPadre];
+void mostrarCambiosLineas(Linea padre, Linea hija){
+    bool huboCambios = false;
     
-    Linea *arrHija  = NULL;
-    if (tamanioHija > 0)
-        arrHija = new Linea[tamanioHija];
-
-    unsigned int i = 0;
-
-    iterPadre = padre;
-    while (iterPadre != NULL){
-        arrPadre[i] = iterPadre;
-        i++;
-        iterPadre = iterPadre->sig;
+    while (padre != NULL || hija != NULL) {
+        if (hija == NULL && padre != NULL) {
+            printf("BL\t%d\n", padre->numLinea);
+            padre = padre->sig;
+            huboCambios = true;
+        } else if (padre == NULL && hija != NULL) {
+            printf("IL\t%d\t%s\n", hija->numLinea, convertirCadenaArregloChar(hija->texto));
+            hija = hija->sig;
+            huboCambios = true;
+        } else if (padre->numLinea < hija->numLinea) {
+            printf("BL\t%d\n", padre->numLinea);
+            padre = padre->sig;
+            huboCambios = true;
+        } else if (padre->numLinea > hija->numLinea) {
+            printf("IL\t%d\t%s\n", hija->numLinea, convertirCadenaArregloChar(hija->texto));
+            hija = hija->sig;
+            huboCambios = true;
+        } else { // mismos números
+            if (!sonIgualesLineas(padre, hija)) {
+                printf("IL\t%d\t%s\n", hija->numLinea, convertirCadenaArregloChar(hija->texto));
+                huboCambios = true;
+            }
+            padre = padre->sig;
+            hija = hija->sig;
+        }
     }
+    if (!huboCambios)
+        printf("No se realizaron modificaciones\n");
 
-    i = 0;
+}
 
-    iterHija = hija;
-    while (iterHija != NULL){
-        arrHija[i] = iterHija;
-        i++;
-        iterHija = iterHija->sig;
-    }
-    
 
-    //creamos arreglos booleanos para marcar las coincidencias
-    bool *coincidePadre = NULL;
-    if (tamanioPadre > 0)
-        coincidePadre = new bool[tamanioPadre];
-    
-    bool *coincideHija  = NULL;
-    if (tamanioHija > 0)
-        coincideHija = new bool[tamanioHija];
-    
-    for (i = 0; i < tamanioPadre; i++){
-        if (coincidePadre)
-            coincidePadre[i] = false;
-    }
-    for (i = 0; i < tamanioHija;  i++){
-        if (coincideHija)
-            coincideHija[i] = false;
-    }
+/*void mostrarCambiosLineas(Linea padre, Linea hija){
+    bool huboCambios = false;
+    while (padre != NULL || hija != NULL){
+        //si hija es mas "larga" que el padre
+        if (padre == NULL && hija != NULL){
+            printf("IL\t%d\t%s\n", hija->numLinea, convertirCadenaArregloChar(hija->texto));
+            hija = hija->sig;
+            huboCambios = true;
+        }
 
-    //cada hija busca su primera coincidencia con el padre
-    for (unsigned int ih = 0; ih < tamanioHija; ih++){
-        for (unsigned int ip = 0; ip < tamanioPadre; ip++){
-            bool hijaYaCoincide = (coincideHija && coincideHija[ih]);
-            if (!hijaYaCoincide){
-                bool padreNoCoincidente = !(coincidePadre && coincidePadre[ip]);
-                if (padreNoCoincidente){
-                    if (sonIgualesCadenas(arrHija[ih]->texto, arrPadre[ip]->texto)){
-                        if (coincideHija)
-                            coincideHija[ih] = true;
-                        if (coincidePadre)
-                            coincidePadre[ip] = true;
-                    }
-                }
+        //si hija es mas "chica" que el padre
+        if (hija == NULL && padre != NULL){
+            printf("BL\t%d\n", padre->numLinea);
+            padre = padre->sig;
+            huboCambios = true;
+        }
+
+        //si hija tiene el mismo largo que el padre y sus lineas son iguales
+        if (padre != NULL && hija != NULL){
+            if (sonIgualesLineas(padre, hija)){
+                padre = padre->sig;
+                hija = hija->sig;
+            }
+        //si tienen el mismo largo pero sus lineas son distintas
+            else {
+                printf("IL\t%d\t%s\n", hija->numLinea, convertirCadenaArregloChar(hija->texto));
+                padre = padre->sig;
+                hija = hija->sig;
+                huboCambios = true;
             }
         }
     }
 
-    bool huboCambios = false;       //hija con respecto al padre
-
-    // hacemos las inserciones IL en orden de la hija
-    for (unsigned int ih = 0; ih < tamanioHija; ih++){
-        if (!(coincideHija && coincideHija[ih])){
-            printf("IL\t%d\t", arrHija[ih]->numLinea);
-            printf("%s\n", convertirCadenaArregloChar(arrHija[ih]->texto));
-            huboCambios = true;
-        }
-    }
-
-    //hacemos los borrados BL en orden del padre
-    for (unsigned int ip = 0; ip < tamanioPadre; ip++){
-        if (!(coincidePadre && coincidePadre[ip])){
-            printf("BL\t%d\n", arrPadre[ip]->numLinea);
-            huboCambios = true;
-        }
-    }
-
-    if (!huboCambios)
+    if(!huboCambios)
         printf("No se realizaron modificaciones\n");
-
-    if (arrPadre) 
-        delete[] arrPadre;
-    if (arrHija) 
-        delete[] arrHija;
-    if (coincidePadre) 
-        delete[] coincidePadre;
-    if (coincideHija) 
-        delete[] coincideHija;
+    
 }
+        */
+
+
+
+
+
 
 
 //*************************** PREDICADOS ********************** */

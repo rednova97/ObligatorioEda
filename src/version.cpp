@@ -8,6 +8,21 @@
 #define MAX_VERSIONES 10
 
 
+struct nodoAV {
+    int* numeroVersion;
+    int tope;
+    Linea linea;
+    nodoAV * pH;        //primer hijo
+    nodoAV * sH;        //siguiente hermano    
+}; typedef nodoAV * AV;
+
+
+struct _rep_version {
+    AV versionRaiz;
+    _rep_version *sig;
+};
+
+
 //*****************  FUNCIONES AUXILIARES **************************/
 //pre-cond: no tiene
 //pos-cond: convierte un string con caracteres "numeros" en un arreglo de enteros y lo guarda en "numero", eliminando los puntos. Si el string es 1.2.1 lo convierte a 1 2 1 
@@ -33,6 +48,12 @@ void renumeracionAscendente(AV t, int pos);
 //pos-cond: reenumera los hijos y hermanos de la version t como t - 1 a partir de la posicion pos
 void renumeracionDescendente(AV t, int pos);
 
+AV obtenerNodoVersion(Version &version, char *numVersion);
+
+//Pre-Cond: No tiene
+//Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
+int numeroUltimaLineaVersion(AV ver, char *numeroVersion);
+
 //Pre-cond: no tiene
 //Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
 AV buscar(AV t, int *numeroVersion, int tope);
@@ -52,6 +73,8 @@ void imprimirAV(AV t, int nivel);
 //pos-cond: devuelve el nodo mas a la derecha de un arbol finitario
 AV ultimoNodoDerecha(AV t);
 
+char *obtenerNumeroPadre(char* numHija);
+
 //pre-cond: a y b tienen el mismo tamanio
 //pos-cond: devuelve true si a y b son iguales
 bool sonIgualesArrInt(int *a, int *b, int sizeA, int sizeB);
@@ -70,6 +93,10 @@ bool tienePadre(Version version, char* numeroVersion);
 //pos-cond: devuelve TRUE si la version numeroVersion tiene subversiones
 bool tieneHijas(Version version, char* numeroVersion);
 
+bool agregueLinea(Version version, char* numeroVersion);
+
+bool borreLinea(Version version, char* numeroVersion);
+
 //Pos-cond: elimina los hijos de un arbol
 void eliminarSoloHijos(AV &t);
 
@@ -78,22 +105,15 @@ void eliminarAV(AV &t);
 
 char* convertirArrIntEnString(int *arrInt, int tope);
 
+//pre-cond: la subversion a eliminar existe
+//pos-cond: elimina una subversion y sus hijas
+void eliminarSubVersion(AV &nodoVer, AV subVersion);
+
 //***************** FIN FUNCIONES AUXILIARES****** */
 
 
-struct nodoAV {
-    int* numeroVersion;
-    int tope;
-    Linea linea;
-    nodoAV * pH;        //primer hijo
-    nodoAV * sH;        //siguiente hermano    
-};
 
 
-struct _rep_version {
-    AV versionRaiz;
-    _rep_version *sig;
-};
 
 
 //***********************  CONSTRUCTORAS ***************** */
@@ -140,6 +160,9 @@ void copiarArreglo(int *origen, int *destino, int n){
     for (int i=0; i<=n; i++)
         destino[i] = origen[i];
 }
+
+
+
 
 //pre-cond: no tiene
 //pos-cond: crea un nodo con numero de version "numeroVersion" y tope "tope"
@@ -328,6 +351,22 @@ void crearVersion (Version &version, char *num_version){
 
 //************************ SELECTORAS ********************* */
 
+//devuelve un puntero a la version donde se encuentra la version con numero numVersion
+Version obtenerVersion(Version version, char *numVersion){
+    int* arrBusqueda = NULL;
+    int tope;
+    convertirStringEnArrInt(numVersion, arrBusqueda, tope);
+    int aBuscar = arrBusqueda[0];
+    Version res = version;
+    while (res != NULL && res->versionRaiz->numeroVersion[0] != aBuscar)
+        res = res->sig;
+    
+    return res;
+}
+
+
+
+
 //Pre-cond: no tiene
 //Pos-cond: devuelve un puntero al nodo version, si no existe, devuelve NULL
 AV buscar(AV t, int *numeroVersion, int tope){
@@ -347,8 +386,8 @@ AV buscar(AV t, int *numeroVersion, int tope){
 }
 
 
-//Pos-Cond: Retorna un puntero a la version de nombre "numVersion". Retora NULL sino existe
-AV obtenerVersion(Version &version, char *numVersion){
+//Pos-Cond: Retorna un puntero a un nodo de la version de nombre "numVersion". Retora NULL sino existe
+AV obtenerNodoVersion(Version &version, char *numVersion){
     int *arrInt;
     int tope;
     convertirStringEnArrInt(numVersion, arrInt, tope);
@@ -378,28 +417,48 @@ AV obtenerVersion(Version &version, char *numVersion){
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
 //Pos-Cond: Agrega el string textoFila como la fila numLinea de la Version "version". Las filas debajo de num_lineas se renumeran como numLinea=numLinea+1
 void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,unsigned int numLinea){
-    AV aux = obtenerVersion(version, numeroVersion);        //obtenemos la version donde vamos a insertar el string texto
+    AV aux = obtenerNodoVersion(version, numeroVersion);        //obtenemos la version donde vamos a insertar el string texto
     insertarLinea(aux->linea, textoFila, numLinea);         //insertamos la linea en la version y reenumeramos las siguientes por debajo (si hay)   
 }
 
-
-
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
-void imprimirVersion(AV version, char* numeroVersion){
-    printf("%s \n", numeroVersion);
-    printf("\n");
-    int cant = numeroUltimaLineaVersion(version, numeroVersion);       //cantidad de lineas en la version
+void imprimirVersion(Version version, char* numeroVersion){
+    Version temp = obtenerVersion(version, numeroVersion);
+    AV nodoVer = obtenerNodoVersion(temp, numeroVersion);
+    printf("%s \n\n", numeroVersion);
+    int cant = numeroUltimaLineaVersion(nodoVer, numeroVersion);       //cantidad de lineas en la version
     if (cant == 0)
         printf("No contiene lineas.\n");
     else {
         for (int i=1; i<=cant; i++){
-            char* renglon = obtenerTextoLinea(version->linea, i);
+            char* renglon = obtenerTextoLinea(nodoVer->linea, i);
             printf("%d    %s\n", i, renglon);
             delete[] renglon;
         }
     }  
+
 }
+
+//Pre-Cond: La Version "numeroVersion" existe en el Archivo "archivo".
+//Pos-Cond: Imprime el texto correspondiente a la version "numeroVersion"
+void mostrarTextoVersion(Version version, char* numeroVersion){
+    Version ver = obtenerVersion(version, numeroVersion);
+    imprimirVersion(ver, numeroVersion);
+    printf("\n");
+}
+
+
+//Pre-Cond: La Version "numeroVersion" existe en el Archivo "archivo".
+//Pos-Cond: Imprime el texto correspondiente a la version "numeroVersion"
+/*void mostrarTextoArchivoVersion (Archivo archivo, char* numeroVersion){
+    AV version = obtenerVersion(archivo->version, numeroVersion);      //obtenemos la version de la cual queremos imprimir el texto
+    printf("%s - ", archivo->nombre);
+    imprimirVersion(version, numeroVersion);
+    printf("\n");
+}
+*/
+
 
 //imprime un arreglo de enteros
 void imprimirNumeroVersion(int *numero, int tope){
@@ -507,9 +566,12 @@ int numeroUltimaLineaVersion(AV ver, char *numeroVersion){
 char* convertirArrIntEnString(int *arrInt, int tope){
     // 'tope' representa el índice del ÚLTIMO elemento (no la cantidad)
     // Por ejemplo: para version 1.2.3, tope = 2 y elementos en arrInt[0..2]
-    if (tope < 0)
-        return NULL;
-
+    if (tope < 0){
+        char* vacio = new char[1];
+        vacio[0] = '\0';
+        return vacio;
+    }
+            
     int cantidad = tope + 1;
     int maxTam = cantidad * 4 + 1;              
     char* resultado = new char[maxTam];
@@ -526,32 +588,76 @@ char* convertirArrIntEnString(int *arrInt, int tope){
     return resultado;
 }
 
-//pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
-void mostrarCambiosVersion(Version version, char* numeroVersion){
-    int *numVer = NULL;
+
+
+
+//pos-cond: devuelve el numero de la version de padre de la version con numero numHija. Si no tiene padre, devuelve NULL
+char *obtenerNumeroPadre(char* numHija){
+    int* arrInt = NULL;
     int tope;
-    convertirStringEnArrInt(numeroVersion, numVer, tope);
+    convertirStringEnArrInt(numHija, arrInt, tope);
 
-    AV hija = obtenerVersion(version, numeroVersion);
+    int nuevoTope = tope - 1;
+    if (nuevoTope < 0)          // si no hay padre (ej: versión "1")
+        nuevoTope = -1;
 
-    AV padre = NULL;
-    if (tope > 0){
-        int *padreVer = new int[tope];
-        copiarArreglo(numVer, padreVer, tope - 1);
-        char* padreStr = convertirArrIntEnString(padreVer, tope - 1);
-        padre = obtenerVersion(version, padreStr);
+    char* numPadre = convertirArrIntEnString(arrInt, nuevoTope);
+    delete[] arrInt;
+    return numPadre;
+}
 
-        delete[] padreVer;
-        delete[] padreStr;
+//pre-cond: la version numeroVersion existe
+//pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
+void mostrarCambiosVersion(Version version, char *numeroVersion){
+    char* numPadre = obtenerNumeroPadre(numeroVersion);
+    int* arrNumPadre = NULL;
+    int topePadre;
+    convertirStringEnArrInt(numPadre, arrNumPadre, topePadre);
+
+    //caso numeroVersion es la raiz
+    if (topePadre == 0){
+        int* numHija = NULL;
+        int topeHija;
+        convertirStringEnArrInt(numeroVersion, numHija, topeHija);
+
+        Version aux = version;
+        while (aux != NULL && aux->versionRaiz->numeroVersion[0] != numHija[0])
+            aux = aux->sig;
+
+        AV hija = buscar(aux->versionRaiz, numHija, topeHija);
+        mostrarCambiosLineas(NULL, hija->linea);
+
+        delete[] numHija;
+    }
+    else {
+        Version aux = version;
+        while (aux != NULL && !sonIgualesArrInt(aux->versionRaiz->numeroVersion, arrNumPadre, aux->versionRaiz->tope + 1, topePadre + 1))
+            aux = aux->sig;
+
+        
+        
+        AV padre = buscar(aux->versionRaiz, arrNumPadre, topePadre);
+
+        int* numHija = NULL;
+        int topeHija;
+        convertirStringEnArrInt(numeroVersion, numHija, topeHija);
+        AV hija = buscar(aux->versionRaiz, numHija, topeHija);
+
+        if (padre != NULL)
+            mostrarCambiosLineas(padre->linea, hija->linea);
+        else
+            mostrarCambiosLineas(NULL, hija->linea);
+
+        delete[] numHija;
+        
     }
 
-    if (padre != NULL)
-        mostrarDiferenciasLineas(padre->linea, hija->linea);
-    else
-        mostrarDiferenciasLineas(NULL, hija->linea);
+    delete[] numPadre;
+    delete[] arrNumPadre;
 
-    delete[] numVer;
 }
+
+
 
 //********************* PREDICADOS ************************* */
 //pre-cond:No tiene
@@ -750,7 +856,7 @@ bool puedeInsertarLinea(Version version, char* numeroVersion, unsigned int numLi
     if (!existeVersion(version, numeroVersion))
         return false;
 
-    AV ver = obtenerVersion(version, numeroVersion);
+    AV ver = obtenerNodoVersion(version, numeroVersion);
     if (ver == NULL)
         return false;
 
@@ -769,7 +875,7 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
     if (!existeVersion(version, numeroVersion))
         return false;
 
-    AV ver = obtenerVersion(version, numeroVersion);
+    AV ver = obtenerNodoVersion(version, numeroVersion);
     if (ver == NULL)
         return false;
 
@@ -790,7 +896,7 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
 //Pre-Cond: la version "numeroVersion" existe y la Linea "numLinea" existe en la version "version"
 //Pos-Cond: se elimina la Linea de la posicion "numLinea" el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
 void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int numLinea){
-    AV aux = obtenerVersion(version, numeroVersion);
+    AV aux = obtenerNodoVersion(version, numeroVersion);
     eliminarLinea(aux->linea, numLinea);
 }
 

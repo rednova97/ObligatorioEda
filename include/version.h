@@ -12,7 +12,7 @@
 #define _VERSION_H
 
 
-typedef struct nodoAV * AV;
+
 
 typedef struct _rep_version *Version;
 
@@ -32,7 +32,7 @@ void crearVersion (Version &version, char *num_version);
 
 //Pre-Cond: la version numVersion existe en version
 //Pos-Cond: Retorna un puntero a la version de nombre "numVersion"
-AV obtenerVersion(Version &version, char *numVersion);
+Version obtenerVersion(Version version, char *numVersion);
 
 
 //Pre-cond: La version "version" tiene por lo menos "numLinea" de Lineas
@@ -42,7 +42,11 @@ void agregarFilaVersion (Version &version, char* numeroVersion, char *textoFila,
 
 //Pre-Cond: existeVersion(version, numeroVersion) retorna true.
 //Pos-Cond: Imprime la Version "numeroVersion" junto con sus lineas
-void imprimirVersion(AV version, char* numeroVersion);
+void imprimirVersion(Version version, char* numeroVersion);
+
+//Pre-Cond: La Version "numeroVersion" existe en el Archivo "archivo".
+//Pos-Cond: Imprime el texto correspondiente a la version "numeroVersion"
+void mostrarTextoVersion(Version version, char* numeroVersion);
 
 //imprime un arreglo de enteros
 void imprimirNumeroVersion(int *numero, int tope);
@@ -64,9 +68,7 @@ int* nombreVersion(int *numeroVersion, int tope);
 int numeroUltimaVersion(Version version);
 
 
-//Pre-Cond: No tiene
-//Pos-Cond: retorna un entero con el numero de la ultima linea de la Verison de "version"
-int numeroUltimaLineaVersion(AV ver, char *numeroVersion);
+
 
 //pos-cond: muestra los cambios de la version hija numeroVersion con respecto a su padre
 void mostrarCambiosVersion(Version version, char* numeroVersion);
@@ -98,10 +100,6 @@ bool puedeBorrarLinea(Version version, char* numeroVersion, unsigned int numLine
 //Pos-Cond: se elimina la Linea de la posicion "numLinea" el resto de las Lineas debajo se renumeran como numLinea=numLinea-1
 void eliminarLineaVersion (Version &version, char* numeroVersion, unsigned int numLinea);
 
-
-//pre-cond: la subversion a eliminar existe
-//pos-cond: elimina una subversion y sus hijas
-void eliminarSubVersion(AV &nodoVer, AV subVersion);
 
 //Pre-Cond: la version "numeroVersion" existe en version
 //Pos-Cond: elimina toda la mermoria reservada por "numeroVersion". Reenumera las siguientes versiones

@@ -50,7 +50,7 @@ char* obtenerTextoLinea (Linea linea, unsigned int numLinea);
 Linea copiarLineas(Linea linea);
 
 //pos-cond: imprime los cambios entre una linea de una version hija con respecto de su padre
-void mostrarDiferenciasLineas(Linea padre, Linea hija);
+void mostrarCambiosLineas(Linea padre, Linea hija);
 
 //*************************** PREDICADOS ********************** */
 
